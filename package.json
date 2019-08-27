@@ -1,0 +1,19 @@
+{
+  "name": "libao",
+  "version": "1.0.0",
+  "description": "extensive toolset for building realtime webgl / canvas sketches. NOTE - LARGE &amp; NOT FOR MOBILE YET",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luan007/libao.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luan007/libao/issues"
+  },
+  "homepage": "https://github.com/luan007/libao#readme"
+}
