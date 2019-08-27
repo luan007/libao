@@ -1,12 +1,13 @@
 import * as post from "postprocessing";
 
 // instantiate a loader
-
+var loaded = true;
 export var threeResources = [];
 
 var manager = THREE.DefaultLoadingManager;
 export function threeLoadObj(file, key) {
     var loader = new THREE.OBJLoader();
+    loaded = false;
     loader.load(
         // resource URL
         file,
@@ -20,6 +21,7 @@ export function threeLoadObj(file, key) {
 export function threeLoadPostprocessingTextures() {
     const areaImage = new Image();
     const searchImage = new Image();
+    loaded = false;
 
     manager.itemStart("smaa_areaImageDataURL");
     manager.itemStart("smaa_searchImageDataURL");
@@ -39,6 +41,7 @@ export function threeLoadPostprocessingTextures() {
 
 var dracoLoader;
 export function threeLoadDraco(file, key, draco_path) {
+    loaded = false;
     dracoLoader = dracoLoader || new THREE.DRACOLoader();
     manager.itemStart(file);
     THREE.DRACOLoader.setDecoderPath(draco_path);
@@ -55,6 +58,7 @@ export function threeLoadDraco(file, key, draco_path) {
 }
 
 export function threeLoadCubemap(file, renderer, key, resolution) {
+    loaded = false;
     var env_loader = new THREE.TextureLoader();
     env_loader.load(file, (res) => {
         var p = new THREE.EquirectangularToCubeGenerator(res, {
@@ -66,10 +70,10 @@ export function threeLoadCubemap(file, renderer, key, resolution) {
 }
 
 export function threeLoadTexture(file, key) {
+    loaded = false;
     threeResources[key] = new THREE.TextureLoader().load(file);
 }
 
-var loaded = false;
 manager.onLoad = () => {
     console.log('All resources loaded');
     loaded = true;
