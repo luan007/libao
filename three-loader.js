@@ -74,6 +74,10 @@ export function threeLoadTexture(file, key) {
     threeResources[key] = new THREE.TextureLoader().load(file);
 }
 
+export function threeGetResource(key) {
+    return threeResources[key];
+}
+
 manager.onLoad = () => {
     console.log('All resources loaded');
     loaded = true;

@@ -113,7 +113,7 @@ export function threePerspectiveCamera(fov, renderer) {
     var cam = new three.PerspectiveCamera(
         fov || 50,
         renderer.width / renderer.height,
-        0.1,
+        0.01,
         2000
     );
 
