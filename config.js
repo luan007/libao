@@ -13,4 +13,5 @@ export function configFromHash() {
             obj[flag[0]] = flag[1];
         }
     }
+    return obj;
 }

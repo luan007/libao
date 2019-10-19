@@ -56,10 +56,24 @@ export function threeToGroup(stuff) {
 
 export var _cache = {};
 
-export function threeScene() {
+
+export function threeScene(return_cached) {
+    if(return_cached && _cache.scene) return _cache.scene;
     var s = new three.Scene();
     _cache.scene = s;
     return s;
+}
+
+export function threeCurrentRenderer() {
+    return _cache.renderer;
+}
+
+export function threeCurrentScene() {
+    return _cache.scene || threeScene();
+}
+
+export function threeCurrentCamera() {
+    return _cache.camera;
 }
 
 export function threeOrbitControl(options) {
