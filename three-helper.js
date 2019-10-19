@@ -423,7 +423,7 @@ export function threeVec2ScreenScale(v, w, h) {
 //debug logic..
 export function threeDebugBox() {
     var box = new three.BoxGeometry(1, 1, 1);
-    var mat = new three.MeshNormalMaterial();
+    var mat = new three.MeshBasicMaterial();
     return new three.Mesh(box, mat);
 }
 

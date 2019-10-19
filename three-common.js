@@ -11,7 +11,6 @@ import "three/examples/js/controls/OrbitControls";
 import "three/examples/js/controls/FirstPersonControls";
 import "three/examples/js/controls/FirstPersonControls";
 import "three/examples/js/controls/FlyControls";
-import "three/examples/js/controls/EditorControls";
 import "three/examples/js/shaders/CopyShader.js";
 import "three/examples/js/shaders/BokehShader.js";
 import "three/examples/js/shaders/SSAOShader.js";
