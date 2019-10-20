@@ -29,7 +29,6 @@ function chunk() {
     });
 }
 
-
 function work() {
     var job = [];
     for (var batch = 0; batch < 6; batch++) {

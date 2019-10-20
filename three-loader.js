@@ -69,6 +69,11 @@ export function threeLoadCubemap(file, renderer, key, resolution) {
     });
 }
 
+export function threeLoadSphereEnv(file, key) {
+    threeResources[key] = new THREE.TextureLoader().load(file);
+    threeResources[key].mapping = THREE.SphericalReflectionMapping;
+}
+
 export function threeLoadTexture(file, key) {
     loaded = false;
     threeResources[key] = new THREE.TextureLoader().load(file);

@@ -376,11 +376,19 @@ export function threeEaseMat(m1, m2, e, p) {
     return d;
 }
 
+
+export function threeLerpMat(mtarget, mfrom, mto, j) {
+    for (var el = 0; el < mtarget.elements.length; el++) {
+        mtarget.elements[el] = 
+            mfrom.elements[el] + (mto.elements[el] - mfrom.elements[el]) * j
+    }
+}
+
 export function threeEaseCameraProjection(cur, target, e, p) {
     // var cur = new three.PerspectiveCamera();
     var d = 0;
     d += threeEaseMat(cur.projectionMatrix, target.projectionMatrix, e, p);
-    d += threeEaseMat(cur.projectionMatrix, target.projectionMatrix, e, p);
+    // d += threeEaseMat(cur.projectionMatrix, target.projectionMatrix, e, p);
     // d += threeEaseMat(cur.matrixWorld, target.matrixWorld, e, p);
     return d;
 }
@@ -435,9 +443,11 @@ export function threeVec2ScreenScale(v, w, h) {
 
 
 //debug logic..
-export function threeDebugBox() {
+export function threeDebugBox(rot) {
     var box = new three.BoxGeometry(1, 1, 1);
-    var mat = new three.MeshBasicMaterial();
+    var mat = new three.MeshBasicMaterial({
+        wireframe: true
+    });
     return new three.Mesh(box, mat);
 }
 
