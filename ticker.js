@@ -47,6 +47,7 @@ export class EasedValue {
         this.to = to;
         this.precision = precision || PRECISION;
         this.e = e;
+        this.velocity = 0;
         _eased_values.push(this);
         this.updating = true;
     }
@@ -54,7 +55,9 @@ export class EasedValue {
         return this.value;
     }
     tick() {
+        var prev = this.value;
         this.value = ease(this.value, this.to, this.e, this.precision);
+        this.velocity = this.value - prev;
     }
     toString() {
         return this.value.toString();
