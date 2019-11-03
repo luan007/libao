@@ -324,5 +324,5 @@ SimplexNoise.prototype.noise4d = function( x, y, z, w ) {
 };
 
 
-window.SimplexNoise = SimplexNoise;
-window.simplex = new SimplexNoise();
+self.SimplexNoise = SimplexNoise;
+self.simplex = new SimplexNoise();

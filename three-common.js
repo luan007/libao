@@ -3,7 +3,7 @@ import "three/examples/js/loaders/RGBELoader";
 import "three/examples/js/loaders/GLTFLoader";
 import "three/examples/js/loaders/DRACOLoader";
 import "three/examples/js/loaders/FBXLoader";
-import "three/examples/js/loaders/EquirectangularToCubeGenerator";
+// import "three/examples/js/loaders/EquirectangularToCubeGenerator";
 import "three/examples/js/loaders/STLLoader";
 import "three/examples/js/loaders/STLLoader";
 import "three/examples/js/loaders/MTLLoader";
