@@ -5,6 +5,15 @@ export function map(q, a, b, c, d, clamp) {
     return raw;
 }
 
+export function avg(arr, offset) {
+    var m = 0;
+    offset = offset || 0;
+    for(var i = 0; i < arr.length; i++){
+        m += (arr[i] + offset) / arr.length;
+    }
+    return m;
+}
+
 export function clamp(v, a, b) {
     return v < a ? a : (v > b ? b : v);
 }
