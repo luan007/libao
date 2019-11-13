@@ -377,7 +377,7 @@ export function threeEaseCameraProjection(cur, target, e, p) {
 var calc_vec = new three.Vector3();
 export function threeScreenPosition(p, q, n, camera, renderer) {
     var v = null;
-    if (p instanceof three.Vector3) {
+    if (p && p.x != null) {
         calc_vec.set(p.x, p.y, p.z);
         camera = q;
         renderer = n;
