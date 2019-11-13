@@ -56,10 +56,24 @@ export function threeToGroup(stuff) {
 
 export var _cache = {};
 
-export function threeScene() {
+
+export function threeScene(return_cached) {
+    if(return_cached && _cache.scene) return _cache.scene;
     var s = new three.Scene();
     _cache.scene = s;
     return s;
+}
+
+export function threeCurrentRenderer() {
+    return _cache.renderer;
+}
+
+export function threeCurrentScene() {
+    return _cache.scene || threeScene();
+}
+
+export function threeCurrentCamera() {
+    return _cache.camera;
 }
 
 export function threeOrbitControl(options) {
@@ -362,11 +376,19 @@ export function threeEaseMat(m1, m2, e, p) {
     return d;
 }
 
+
+export function threeLerpMat(mtarget, mfrom, mto, j) {
+    for (var el = 0; el < mtarget.elements.length; el++) {
+        mtarget.elements[el] = 
+            mfrom.elements[el] + (mto.elements[el] - mfrom.elements[el]) * j
+    }
+}
+
 export function threeEaseCameraProjection(cur, target, e, p) {
     // var cur = new three.PerspectiveCamera();
     var d = 0;
     d += threeEaseMat(cur.projectionMatrix, target.projectionMatrix, e, p);
-    d += threeEaseMat(cur.projectionMatrix, target.projectionMatrix, e, p);
+    // d += threeEaseMat(cur.projectionMatrix, target.projectionMatrix, e, p);
     // d += threeEaseMat(cur.matrixWorld, target.matrixWorld, e, p);
     return d;
 }
@@ -421,9 +443,11 @@ export function threeVec2ScreenScale(v, w, h) {
 
 
 //debug logic..
-export function threeDebugBox() {
+export function threeDebugBox(rot) {
     var box = new three.BoxGeometry(1, 1, 1);
-    var mat = new three.MeshNormalMaterial();
+    var mat = new three.MeshBasicMaterial({
+        wireframe: true
+    });
     return new three.Mesh(box, mat);
 }
 

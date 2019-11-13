@@ -1,4 +1,5 @@
 import p5 from "p5";
+self.p5 = p5;
 import "p5/lib/addons/p5.sound";
 var _img_to_load = 0;
 var _global_init = false;

@@ -20,11 +20,15 @@
   "dependencies": {
     "dat.gui": "^0.7.6",
     "gl-matrix": "^3.1.0",
-    "open-simplex-noise": "^1.6.0",
+    "open-simplex-noise": "^1.7.0",
     "operative": "^0.4.6",
     "p5": "^0.9.0",
-    "postprocessing": "^6.7.0",
+    "postprocessing": "^6.8.8",
     "qps": "^1.1.1",
-    "three": "^0.107.0"
+    "three": "^0.110.0",
+    "vue": "^2.6.10"
+  },
+  "alias": {
+    "vue": "./node_modules/vue/dist/vue.common.js"
   }
 }

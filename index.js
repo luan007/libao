@@ -11,6 +11,7 @@ export * from "./three-loader";
 export * from "./p5-helper";
 export * from "./fader";
 export * from "./loader";
+export * from "./config";
 
 import * as _exc from "./extra/extra"
 export var extra = _exc;

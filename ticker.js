@@ -1,6 +1,16 @@
 //tiny updatez
 const PRECISION = 0.01;
 var deltaT = 0;
+var LIMIT_T = true; //set this to false will ensure Date.now() gets used
+
+
+
+
+
+//0-1 range easing
+export function ease_complex_curve(f, t, sp, precision) {
+    //TBD - map abs(f-t) with sin & cos
+}
 
 export function ease(f, t, sp, precision) {
     precision = precision || PRECISION;
@@ -37,6 +47,7 @@ export class EasedValue {
         this.to = to;
         this.precision = precision || PRECISION;
         this.e = e;
+        this.velocity = 0;
         _eased_values.push(this);
         this.updating = true;
     }
@@ -44,7 +55,9 @@ export class EasedValue {
         return this.value;
     }
     tick() {
+        var prev = this.value;
         this.value = ease(this.value, this.to, this.e, this.precision);
+        this.velocity = this.value - prev;
     }
     toString() {
         return this.value.toString();
@@ -76,7 +89,11 @@ export function tick() {
     if (deltaT > 3) {
         deltaT = 1;
     }
-    t = ((Date.now()) % 1000000) * 0.001;
+    if (LIMIT_T) {
+        t = ((Date.now()) % 100000000) * 0.001;
+    } else {
+        t = ((Date.now())) * 0.001;
+    }
     if (removal.length > 0) {
         var _new = [];
         for (var i = 0; i < all.length; i++) {
@@ -108,7 +125,8 @@ export function noLoop(func) {
     removal.push(func);
 }
 
-export function looperStart() {
+export function looperStart(lim_t) {
+    LIMIT_T = lim_t;
     var _updator_thread = function () {
         requestAnimationFrame(_updator_thread);
         tick();
