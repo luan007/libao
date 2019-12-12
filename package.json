@@ -15,7 +15,6 @@
   "bugs": {
     "url": "https://github.com/luan007/libao/issues"
   },
- 
   "homepage": "https://github.com/luan007/libao#readme",
   "dependencies": {
     "dat.gui": "^0.7.6",

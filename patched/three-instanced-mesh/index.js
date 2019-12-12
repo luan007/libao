@@ -50,6 +50,7 @@ module.exports = function (THREE) {
 		uniformScale
 	) {
 
+		console.log(bufferGeometry);
 		THREE.Mesh.call(this, (new THREE.InstancedBufferGeometry()).copy(bufferGeometry)); //hacky for now
 
 		this._dynamic = !!dynamic; //TODO: set a bit mask for different attributes?
@@ -399,7 +400,7 @@ module.exports = function (THREE) {
 			}
 
 			attribute.dynamic = this._dynamic
-			this.geometry.addAttribute(name, attribute)
+			this.geometry.setAttribute(name, attribute)
 		})
 
 	};

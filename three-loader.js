@@ -61,11 +61,14 @@ export function threeLoadCubemap(file, renderer, key, resolution) {
     loaded = false;
     var env_loader = new THREE.TextureLoader();
     env_loader.load(file, (res) => {
-        var p = new THREE.EquirectangularToCubeGenerator(res, {
-            resolution: resolution || 1024
-        });
-        p.update(renderer);
-        threeResources[key] = p.renderTarget;
+        var options = {
+            generateMipmaps: true,
+            minFilter: THREE.LinearMipMapLinearFilter,
+            magFilter: THREE.LinearFilter
+        };
+        var resolution = 1024;
+        var cubeMap = new THREE.WebGLRenderTargetCube(resolution, resolution, options).fromEquirectangularTexture(renderer, res);
+        threeResources[key] = cubeMap;
     });
 }
 
