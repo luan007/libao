@@ -30,3 +30,35 @@ import "three/examples/js/postprocessing/SAOPass.js";
 import "three/examples/js/postprocessing/SMAAPass.js";
 import "three/examples/js/postprocessing/BloomPass.js";
 import "three/examples/js/postprocessing/UnrealBloomPass.js";
+
+
+
+import "three/examples/js/postprocessing/EffectComposer";
+import "three/examples/js/shaders/CopyShader";
+import "three/examples/js/shaders/LuminosityHighPassShader";
+import "three/examples/js/shaders/ColorCorrectionShader";
+import "three/examples/js/shaders/UnpackDepthRGBAShader";
+import "three/examples/js/shaders/DepthLimitedBlurShader";
+import "three/examples/js/shaders/SAOShader";
+import "three/examples/js/shaders/FilmShader";
+import "three/examples/js/shaders/FXAAShader";
+import "three/examples/js/shaders/SMAAShader";
+import "three/examples/js/shaders/SSAOShader";
+import "three/examples/js/shaders/RGBShiftShader";
+import "three/examples/js/shaders/VerticalTiltShiftShader";
+import "three/examples/js/shaders/HorizontalTiltShiftShader";
+import "three/examples/js/postprocessing/SavePass";
+import "three/examples/js/postprocessing/ShaderPass";
+import "three/examples/js/postprocessing/MaskPass";
+import "three/examples/js/postprocessing/RenderPass";
+import "three/examples/js/postprocessing/SMAAPass";
+import "three/examples/js/postprocessing/FilmPass";
+import "three/examples/js/postprocessing/SSAOPass";
+import "three/examples/js/postprocessing/SAOPass";
+import "three/examples/js/postprocessing/ClearPass";
+import "three/examples/js/postprocessing/UnrealBloomPass";
+
+
+import "three/examples/js/loaders/HDRCubeTextureLoader";
+import "three/examples/js/pmrem/PMREMGenerator";
+import "three/examples/js/pmrem/PMREMCubeUVPacker";

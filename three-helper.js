@@ -76,9 +76,9 @@ export function threeCurrentCamera() {
     return _cache.camera;
 }
 
-export function threeOrbitControl(options) {
+export function threeOrbitControl(dom, options) {
     options = options || _cache;
-    var controls = new THREE.OrbitControls(options.camera);
+    var controls = new THREE.OrbitControls(options.camera, dom || document.body);
     controls.update();
     _cache.controls = controls;
     options.camera.position.set(options.x || 0, options.y || 0, options.z || 100);

@@ -400,7 +400,7 @@ module.exports = function (THREE) {
 			}
 
 			attribute.dynamic = this._dynamic
-			this.geometry.setAttribute(name, attribute)
+			this.geometry.addAttribute(name, attribute)
 		})
 
 	};

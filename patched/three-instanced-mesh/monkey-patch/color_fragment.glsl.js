@@ -15,7 +15,9 @@ module.exports = [
 '#if defined(INSTANCE_COLOR)',
 		
 	'diffuseColor.rgb *= vInstanceColor;',
-		
+	'#ifdef PHYSICAL',
+    'totalEmissiveRadiance.rgb *= vInstanceColor2;',
+    '#endif',
 '#endif'
 
 ].join("\n")

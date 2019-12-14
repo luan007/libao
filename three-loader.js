@@ -57,7 +57,7 @@ export function threeLoadDraco(file, key, draco_path) {
     );
 }
 
-export function threeLoadCubemap(file, renderer, key, resolution) {
+export function threeLoadCubemap(file, renderer, key, _resolution) {
     loaded = false;
     var env_loader = new THREE.TextureLoader();
     env_loader.load(file, (res) => {
@@ -66,9 +66,9 @@ export function threeLoadCubemap(file, renderer, key, resolution) {
             minFilter: THREE.LinearMipMapLinearFilter,
             magFilter: THREE.LinearFilter
         };
-        var resolution = 1024;
+        var resolution = _resolution || 1024;
         var cubeMap = new THREE.WebGLRenderTargetCube(resolution, resolution, options).fromEquirectangularTexture(renderer, res);
-        threeResources[key] = cubeMap;
+        threeResources[key] = cubeMap.texture;
     });
 }
 
@@ -118,4 +118,57 @@ export function threeOnProgress(cb) {
         }
         cb();
     };
+}
+
+
+
+export function threeLoadHDR_PMREM(key, renderer, path, urls) {
+    loaded = false;
+    urls = urls || ['px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr'];
+    var hdrCubeMap = new THREE.HDRCubeTextureLoader()
+        .setPath(path)
+        .setDataType(THREE.UnsignedByteType)
+        .load(urls, function () {
+            var pmremGenerator = new THREE.PMREMGenerator(hdrCubeMap);
+            pmremGenerator.update(renderer);
+
+            var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker(pmremGenerator.cubeLods);
+            pmremCubeUVPacker.update(renderer);
+
+            var hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+            console.log(hdrCubeRenderTarget);
+
+            hdrCubeMap.magFilter = THREE.LinearFilter;
+            hdrCubeMap.needsUpdate = true;
+
+            pmremGenerator.dispose();
+            pmremCubeUVPacker.dispose();
+            threeResources[key] = hdrCubeRenderTarget.texture;
+            threeResources[key + "_cube"] = hdrCubeMap;
+        });
+}
+
+
+export function threeLoadLDR_PMREM(key, renderer, path, urls) {
+    loaded = false;
+    urls = urls || ['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'];
+    var ldrCubeMap = new THREE.CubeTextureLoader()
+        .setPath(path)
+        .load(urls, function () {
+            var pmremGenerator = new THREE.PMREMGenerator(ldrCubeMap);
+            pmremGenerator.update(renderer);
+
+            var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker(pmremGenerator.cubeLods);
+            pmremCubeUVPacker.update(renderer);
+
+            var target = pmremCubeUVPacker.CubeUVRenderTarget;
+
+            ldrCubeMap.magFilter = THREE.LinearFilter;
+            ldrCubeMap.needsUpdate = true;
+
+            pmremGenerator.dispose();
+            pmremCubeUVPacker.dispose();
+            threeResources[key] = target.texture;
+            threeResources[key + "_cube"] = ldrCubeMap;
+        });
 }

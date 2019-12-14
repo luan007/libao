@@ -51,7 +51,7 @@ export function particleModifier(update, active_stages, params) {
     return {
         update: update,
         stages: active_stages,
-        params: {},
+        params: params,
         disabled: false
     };
 }
@@ -176,7 +176,7 @@ export function particleSpawn(arr, modifiers, extended) {
 export function particleFixedAllocate(modifiers, extended, count) {
     var arr = [];
     arr.spots = arr.spots || [];
-    for (var i = 0; i <= count; i++) {
+    for (var i = 0; i < count; i++) {
         let p = particleSpawn(arr, modifiers, extended);
         p.p[0] = 0; //ao.rrand(-20, 20);
         p.p[1] = 0; //ao.rrand(-20, 20);
@@ -185,7 +185,7 @@ export function particleFixedAllocate(modifiers, extended, count) {
         p.life = 0;
         p.empty = true;
     }
-    for(var i = 0; i <= count; i++) {
+    for (var i = 0; i < count; i++) {
         arr.spots.push(i);
     }
     //lock now
