@@ -1,3 +1,6 @@
+import eem3 from "eventemitter3"
+export var EventEmitter = eem3;
+
 export function eventPub() {
     var cbs = [];
     var trigger = function (cb) { //trigger

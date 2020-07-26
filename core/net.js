@@ -1,5 +1,6 @@
 import qps from "qps";
 
+export var QPS = qps;
 var _promise_queues = {};
 
 export function Promise_Queue_Settings(_queue_name, concurrent_max, interval, qps) {
@@ -84,4 +85,33 @@ export function Promise_Queue(return_promise, _queue_name) {
         p_q_add(_queue_name, actual_work);
     })
     return promise;
+}
+
+export function fetchJSON(v, cb) {
+    var key = v.split('/').pop().replace(/\.json/gi, "");
+    return fetch(v).then((r) => {
+        // console.log("Loaded", v)
+        return r.json()
+    }).then((t) => {
+        // console.log("Parsed", v)
+        if(typeof(cb) == 'object') {
+            cb[key] = t;
+        } else {
+            cb(key, t, v);
+        }
+    })
+}
+export function fetchText(v, cb) {
+    var key = v.split('/').pop().replace(/\.json/gi, "");
+    return fetch(v).then((r) => {
+        // console.log("Loaded", v)
+        return r.text()
+    }).then((t) => {
+        // console.log("Parsed", v)
+        if(typeof(cb) == 'object') {
+            cb[key] = t;
+        } else {
+            cb(key, t, v);
+        }
+    })
 }

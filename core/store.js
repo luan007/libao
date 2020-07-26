@@ -1,3 +1,4 @@
+
 export function configFromHash() {
     var h = location.hash;
     if(!h) return {};
@@ -15,3 +16,4 @@ export function configFromHash() {
     }
     return obj;
 }
+
