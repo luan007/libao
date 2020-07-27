@@ -1,5 +1,5 @@
 //tiny updatez
-const PRECISION = 0.01;
+const PRECISION = 0.0001;
 var deltaT = 0;
 var LIMIT_T = true; //set this to false will ensure Date.now() gets used
 
@@ -11,7 +11,7 @@ export function ease_complex_curve(f, t, sp, precision) {
 export function springRaw(cur, target, velocity, stiffness, damping, mass = 1) {
     //http://en.wikipedia.org/wiki/Hooke%27s_law | F = -kx
     //F = -kx - bv
-    var d = target - cur;
+    var d = -target + cur;
     var f = -1 * (stiffness * d);
     f -= (damping * velocity);
     var acc = f / mass;
@@ -24,12 +24,12 @@ export function springRaw(cur, target, velocity, stiffness, damping, mass = 1) {
     return [cur, velocity];
 }
 
-export function spring(prop, precision = PRECISION) {
+export function springProp(prop, precision = PRECISION) {
     //http://en.wikipedia.org/wiki/Hooke%27s_law | F = -kx
     //F = -kx - bv
-    var { value = 0, to = 0, velocity = 0, stiffness = 0.9, damping = 0.5, mass = 1, stopped = false, completed = false } = prop;
+    var { value = 0, to = 0, velocity = 0, stiffness = 0.001, damping = 0.9, mass = 0.1, stopped = false, completed = false } = prop;
 
-    var d = to - value;
+    var d = -to + value;
     var f = -1 * (stiffness * d);
     f -= (damping * velocity);
     var acc = f / mass;
@@ -59,9 +59,10 @@ export function spring(prop, precision = PRECISION) {
     return prop;
 }
 
+
 var _spring_values = [];
 export class SpringValue {
-    constructor({ value = 0, to = 0, velocity = 0, stiffness = 0.9, damping = 0.5, mass = 1, stopped = false, completed = false }) {
+    constructor({ value = 0, to = 0, velocity = 0, stiffness = 0.1, damping = 0.9, mass = 1, stopped = false, completed = false, precision = PRECISION }) {
         this.value = value;
         this.to = to;
         this.precision = precision || PRECISION;
@@ -78,7 +79,7 @@ export class SpringValue {
         return this.value;
     }
     tick() {
-        this.value = spring(this, this.precision);
+        springProp(this, this.precision);
     }
     toString() {
         return this.value.toString();
@@ -90,6 +91,11 @@ export class SpringValue {
         this.to = v;
     }
 }
+
+export function spring({ value = 0, to = 0, velocity = 0, stiffness = 0.00001, damping = 0.5, mass = 1, stopped = false, completed = false, precision = PRECISION }) {
+    return new SpringValue(arguments[0] || {});
+}
+
 
 function _update_springs() {
     for (var i = 0; i < _spring_values.length; i++) {
@@ -209,7 +215,8 @@ export function loop(func_or_obj) {
     all.push(func);
 }
 
-export function noLoop(func) {
+export function noLoop(func_or_obj) {
+    var func = func_or_obj.update || func_or_obj;
     if (removal.indexOf(func) >= 0) {
         return;
     }
@@ -247,3 +254,15 @@ export function changed(key, cur) {
 
 loop(_update_eased);
 loop(_update_springs);
+
+
+//this is for react
+export function loopEffect(fn, unmount) {
+    return () => { //returns high order func
+        loop(fn);
+        return () => {
+            noLoop(fn);
+            unmount && unmount();
+        };
+    };
+}
