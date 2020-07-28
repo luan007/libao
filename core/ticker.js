@@ -254,15 +254,3 @@ export function changed(key, cur) {
 
 loop(_update_eased);
 loop(_update_springs);
-
-
-//this is for react
-export function loopEffect(fn, unmount) {
-    return () => { //returns high order func
-        loop(fn);
-        return () => {
-            noLoop(fn);
-            unmount && unmount();
-        };
-    };
-}

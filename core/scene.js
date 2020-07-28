@@ -17,7 +17,7 @@ export class Scene {
             this.index = scene_groups[grpId].length - 1;
         }
         this.visibility = eased(0, 0, 0.2, 0.00001);
-        this.updateThreshold = updateThreshold || 0.01;
+        this.updateThreshold = updateThreshold || 0.001;
         this.id = id;
         this.update = updateFunc || (() => {});
         init(this);
