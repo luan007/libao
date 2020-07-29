@@ -31,11 +31,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-three-fiber": "^4.2.17",
-    "three": "^0.110.0",
-    "vue": "^2.6.10"
-  },
-  "alias": {
-    "vue": "./node_modules/vue/dist/vue.common.js"
+    "three": "^0.110.0"
   },
   "devDependencies": {
     "typescript": "^3.9.7"

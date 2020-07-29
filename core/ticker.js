@@ -223,10 +223,16 @@ export function noLoop(func_or_obj) {
     removal.push(func);
 }
 
-export function looperStart(lim_t) {
+export function looperStart(grab_raf, lim_t) {
+    var raf = global.requestAnimationFrame;
+    if (grab_raf) {
+        global.requestAnimationFrame = () => {
+            console.warn("Some Library is causing trouble. RAF HAS BEEN GRABBED BY LOOPER_START from AO for code const perf")
+        }
+    }
     LIMIT_T = lim_t;
     var _updator_thread = function () {
-        requestAnimationFrame(_updator_thread);
+        raf(_updator_thread);
         tick();
     };
     _updator_thread();
