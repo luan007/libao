@@ -66,7 +66,8 @@ const pcss = ({
       return PCF_Filter(shadowMap, uv, zReceiver, filterRadius);
   }`
 
-export const threePCSSShadow = ({
+//called before anything
+export const threePatchPCSS_Shadow = ({
     frustrum = 3.75,
     size = 0.005,
     near = 9.5,
@@ -77,6 +78,7 @@ export const threePCSSShadow = ({
     three = three || THREE;
     // Avoid adding the effect twice, which may happen in HMR scenarios
     if (!three.pcss_patched) {
+        console.warn("AO-PATCH", "PCSS Enabled")
         three.pcss_patched = true
         let shader = three.ShaderChunk.shadowmap_pars_fragment
         shader = shader.replace('#ifdef USE_SHADOWMAP', '#ifdef USE_SHADOWMAP\n' + pcss({ frustrum, size, near, samples, rings }))
@@ -94,3 +96,14 @@ export const threeVSMShadow = ({
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.VSMShadowMap;
 };
+
+export const threeAutoColorMGMT = ({
+    renderer
+}) => {
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
+    renderer.outputEncoding = THREE.sRGBEncoding
+    // renderer.gammaOutput = true;
+    // renderer.gammaFactor = 2.2;
+    renderer.physicallyCorrectLights = true;
+};
+
