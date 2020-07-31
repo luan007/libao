@@ -8,8 +8,14 @@ var calc_vec = new three.Vector3();
 
 export var threeDefaultCtx = {};
 
+export function threeUseRenderSeq(ctx) {
+    ctx.renderSeq = ctx.renderSeq || [];
+    return ctx.renderSeq;
+}
+
 export function threeScene(ctx = threeDefaultCtx) {
     ctx.scene = new three.Scene();
+    return ctx.scene;
 }
 
 export function threeLocalToWorldNoModify(obj3d, vec) {
@@ -32,6 +38,8 @@ export function threePerspectiveCamera(fov, ctx = threeDefaultCtx) {
         cam.aspect = width / height;
         cam.updateProjectionMatrix();
     });
+    cam.aspect = renderer.width / renderer.height;
+    cam.updateProjectionMatrix();
     ctx.camera = cam;
     return cam;
 };
@@ -172,8 +180,8 @@ export function threeRenderer({
     canvas = canvas || ctx.canvas;
     function fit(w, h) {
         renderer.setSize(w, h);
-        renderer.height = w;
-        renderer.width = h;
+        renderer.height = h;
+        renderer.width = w;
         e.emit("resize", w, h);
     }
     if (width > 0 || height > 0) {
@@ -187,6 +195,7 @@ export function threeRenderer({
     ctx.fit = fit;
     renderer.fit = fit;
     renderer.onResize = (fn) => {
+        fn(renderer.width, renderer.height);
         e.on("resize", fn);
     };
     if (autoSize) {
@@ -206,15 +215,18 @@ export function threeRenderer({
     };
 }
 
+export function threeRenderFrame(ctx) {
+    ctx.renderer.render(ctx.scene, ctx.camera);
+}
 
 export function threeTick(ctx = threeDefaultCtx) {
-    if (ctx.alterRender) {
-        ctx.alterRender();
-    } else if (ctx.camera && ctx.scene && ctx.renderer) {
+    var rendered = false;
+    if (ctx.renderSeq) {
+        ctx.renderSeq.forEach((v) => rendered |= !!(v()));
+    } 
+    
+    if (!rendered && ctx.camera && ctx.scene && ctx.renderer) {
         ctx.renderer.render(ctx.scene, ctx.camera);
-    }
-    if (ctx.controls) {
-        ctx.controls.update();
     }
 }
 
@@ -223,12 +235,3 @@ export function threeLoop(ctx = threeDefaultCtx) {
         threeTick(ctx);
     });
 }
-
-// export function threeOrbitControl(dom, options) {
-//     options = options || _cache;
-//     var controls = new THREE.OrbitControls(options.camera, dom || document.body);
-//     controls.update();
-//     _cache.controls = controls;
-//     options.camera.position.set(options.x || 0, options.y || 0, options.z || 100);
-//     return controls;
-// }

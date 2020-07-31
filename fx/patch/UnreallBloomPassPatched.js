@@ -12,7 +12,8 @@ import {
 	UniformsUtils,
 	Vector2,
 	Vector3,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	HalfFloatType
 } from "three/build/three.module.js";
 import { Pass } from "three/examples/jsm/postprocessing/Pass.js";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader.js";
@@ -41,7 +42,7 @@ var PatchedUnrealBloomPass = function ( resolution, strength, radius, threshold 
 	this.clearColor = new Color( 0, 0, 0 );
 
 	// render targets
-	var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat, type: THREE.HalfFloatType };
+	var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat, type: HalfFloatType };
 	this.renderTargetsHorizontal = [];
 	this.renderTargetsVertical = [];
 	this.nMips = 5;

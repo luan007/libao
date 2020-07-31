@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { threeDefaultCtx } from "./three-util";
 const pcss = ({
     frustrum = 3.75,
     size = 0.005,
@@ -90,20 +91,54 @@ export const threePatchPCSS_Shadow = ({
     }
 }
 
-export const threeVSMShadow = ({
-    renderer
-}) => {
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.VSMShadowMap;
+export const threeVSMShadow = (ctx = threeDefaultCtx) => {
+    ctx.renderer.shadowMap.enabled = true;
+    ctx.renderer.shadowMap.type = THREE.VSMShadowMap;
 };
 
-export const threeAutoColorMGMT = ({
-    renderer
-}) => {
-    renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.outputEncoding = THREE.sRGBEncoding
+export const threeUseToneMapping = ({
+    toneMapping = THREE.ACESFilmicToneMapping,
+    aces_exposure = 1.3
+}, ctx = threeDefaultCtx) => {
+    var params = {
+        toneMapping, aces_exposure
+    };
+    if (!THREE.ShaderChunk.tonemapping_pars_fragment_backup) {
+        THREE.ShaderChunk.tonemapping_pars_fragment_raw = THREE.ShaderChunk.tonemapping_pars_fragment;
+        THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment.replace(
+            'vec3 CustomToneMapping( vec3 color ) { return color; }',
+            `#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )
+        float toneMappingWhitePoint = 1.0;
+        vec3 CustomToneMapping( vec3 color ) {
+            color *= toneMappingExposure;
+            return saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( toneMappingWhitePoint ) ) );
+        }`
+        );
+        THREE.ShaderChunk.tonemapping_pars_fragment_backup = THREE.ShaderChunk.tonemapping_pars_fragment;
+    }
+
+    THREE.ShaderChunk.tonemapping_pars_fragment_aces = THREE.ShaderChunk.tonemapping_pars_fragment_backup.replace("return saturate( color );", "return color * " + (Math.round(aces_exposure * 10) / 10).toFixed(1) + ";");
+    if (toneMapping == THREE.ACESFilmicToneMapping) {
+        console.warn("AO-PATCH", "ACES")
+        THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment_aces;
+    }
+    else {
+        THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment_backup;
+    }
+    ctx.renderer.toneMapping = toneMapping;
+    function update() { }
+    return {
+        update: update,
+        params: params,
+        ctx: ctx
+    };
+};
+
+export const threeAutoColorMGMT = (ctx = threeDefaultCtx) => {
+    ctx.renderer.outputEncoding = THREE.sRGBEncoding
     // renderer.gammaOutput = true;
     // renderer.gammaFactor = 2.2;
-    renderer.physicallyCorrectLights = true;
+    ctx.renderer.physicallyCorrectLights = true;
+    threeUseToneMapping({}, ctx);
 };
 
