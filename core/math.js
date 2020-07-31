@@ -153,15 +153,16 @@ export function place(item, arr, max_length) {
     return arr.length - 1;
 }
 
-import OpenSimplexNoise from "open-simplex-noise";
-
-export var openSimplex = new OpenSimplexNoise();
+import * as OpenSimplexNoise from "open-simplex-noise";
+export var n4d = OpenSimplexNoise.makeNoise4D();
+export var n3d = OpenSimplexNoise.makeNoise3D();
+export var n2d = OpenSimplexNoise.makeNoise2D();
 export function simplexArray2d(width, height, scale) {
     var output = new Array(width);
     for (var x = 0; x < width; x++) {
         output[x] = new Array(height);
         for (var y = 0; y < height; y++) {
-            output[x][y] = openSimplex.noise2D(x * scale, y * scale);
+            output[x][y] = n2d(x * scale, y * scale);
         }
     }
     return output;
@@ -174,7 +175,7 @@ export function simplexArray3d(width, height, depth, scale) {
         for (var y = 0; y < height; y++) {
             output[x][y] = new Array(depth);
             for (var z = 0; z < depth; z++) {
-                output[x][y][z] = OpenSimplexNoise.noise3D(x * scale, y * scale, z * scale);
+                output[x][y][z] = n3d(x * scale, y * scale, z * scale);
             }
         }
     }
@@ -190,7 +191,7 @@ export function simplexArray4d(width, height, depth, wLength, scale) {
             for (var z = 0; z < depth; z++) {
                 output[x][y][z] = new Array(wLength);
                 for (var w = 0; w < wLength; w++) {
-                    output[x][y][z][w] = openSimplex.noise4D(x * scale, y * scale, z * scale, w * scale);
+                    output[x][y][z][w] = n4d(x * scale, y * scale, z * scale, w * scale);
                 }
             }
         }
