@@ -18,6 +18,7 @@ import * as three from "three";
 
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass'
 import { PatchedUnrealBloomPass } from "./patch/UnreallBloomPassPatched";
+import { deltaTMultipler } from '../core';
 
 export function threeFXPatchEffect(proto) {
     if (proto.patched) return; //skip, already done!
@@ -44,7 +45,8 @@ export var threeFXComposer = ({ skipRenderPass = false }, ctx = threeDefaultCtx)
     ctx.composer = composer;
     ctx.clock = clock;
     threeUseRenderSeq(ctx).push(() => {
-        composer.render(clock.getDelta());
+        var delta = clock.getDelta();
+        composer.render(delta);
         return true;
     });
     if (!skipRenderPass) {
@@ -70,16 +72,18 @@ export var threeFXUnrealPass = ({
     resolution = new three.Vector2(512, 512),
     threshold = 0.8,
     strength = 0.4,
-    radius = 1
+    radius = 1,
+    unifiedFactor = 0.5
 }, ctx = threeDefaultCtx) => {
     threeFXPatchEffect(PatchedUnrealBloomPass);
-    var pass = new PatchedUnrealBloomPass(resolution, strength, threshold, radius)
+    var pass = new PatchedUnrealBloomPass(resolution, strength, radius, threshold, unifiedFactor)
     ctx.composer.addPass(pass);
     var params = {
         resolution,
         threshold,
         strength,
-        radius
+        radius,
+        unifiedFactor
     };
     return { pass: pass, params: params, update: () => { } };
 };
@@ -119,9 +123,17 @@ export var threeFXSMAAEffect = ({
     searchImage,
     areaImage
 }, ctx = threeDefaultCtx) => {
+    if(!searchImage && !ctx.fx_smaa_textures) {
+        throw "SMAA Effect requires ctx.fx_smaa_textures, load them first or manually set searchImage"
+    }
+    searchImage = searchImage || ctx.fx_smaa_textures[0];
+    areaImage = areaImage || ctx.fx_smaa_textures[1];
+    var params = {
+        searchImage, areaImage, edgeDetection
+    };
     const smaaEffect = new SMAAEffect(searchImage, areaImage)
     smaaEffect.colorEdgesMaterial.setEdgeDetectionThreshold(edgeDetection)
-    return { pass: smaaEffect, params: params, update: () => { } };
+    return { effect: smaaEffect, params: params, update: () => { }, is_effect_shell: true };
 };
 
 export var threeFXEffectPass = (arr_of_effects = [], ctx = threeDefaultCtx) => {
@@ -136,10 +148,13 @@ export var threeFXEffectPass = (arr_of_effects = [], ctx = threeDefaultCtx) => {
     return { pass: pass, params: params, update: () => { } };
 };
 
-export var threeFXNormalPass = (ctx = threeDefaultCtx) => {
-    var params = {};
+export var threeFXNormalPass = ({
+    resolutionScale = 0.5
+}, ctx = threeDefaultCtx) => {
+    var params = { resolutionScale };
     var pass = new NormalPass(ctx.scene, ctx.camera);
     ctx.composer.addPass(pass);
+    pass.resolution.scale = resolutionScale;
     ctx.composer_normal_pass = pass;
     return { pass: pass, params: params, update: () => { } };
 }
@@ -247,6 +262,25 @@ export var threeFXSSAOEffect_PRESETS = {
         fade: 0.001,
         color: new three.Color(0, 0, 0),
         resolutionScale: 0.5 //fast
+    },
+
+    Fast_SSAO_Detail: {
+        samples: 9,
+        rings: 7,
+        color: 0,
+        intensity: 3,
+        bias: 0.1,
+        radius: 2,
+        luminanceInfluence: 0.2
+    },
+    Fast_SSAO: {
+        samples: 7,
+        rings: 3,
+        color: 0,
+        intensity: 2,
+        bias: 0.05,
+        radius: 10,
+        luminanceInfluence: 0.2
     }
 };
 
@@ -300,3 +334,14 @@ export var threeFXBloomEffect = ({
     const bloomEffect = new BloomEffect(params);
     return { effect: bloomEffect, params: params, update: () => { }, is_effect_shell: true };
 };
+
+
+export var threeFXSMAAEffect_GetImages = (ctx = threeDefaultCtx) => {
+    var smaa = new SMAAImageLoader();
+    return new Promise((res, rej) => {
+        smaa.load((result) => {
+            ctx.fx_smaa_textures = result;
+            res(result);
+        }, rej);
+    })
+}
