@@ -31,7 +31,7 @@ export function threeOrbitControl({
     autoRotate = false,
     autoRotateSpeed = 0,
     target = new three.Vector3(0, 0, 0),
-    camPos = new three.Vector3(0, 0, 0),
+    camPos = new three.Vector3(0, 0, 10),
 }, ctx = threeDefaultCtx) {
     //document.body is not used
     domElement = domElement ? domElement : ctx.renderer.domElement;
@@ -68,7 +68,6 @@ export function threeOrbitControl({
         camPos,
         object: ctx.camera
     };
-    console.log(params);
     params.object = ctx.camera;
 
     function apply(params) {

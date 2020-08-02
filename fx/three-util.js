@@ -25,8 +25,7 @@ export function threeLocalToWorldNoModify(obj3d, vec) {
     return obj3d.localToWorld(_vec);
 }
 
-export function threePerspectiveCamera(fov, ctx = threeDefaultCtx) {
-    fov = fov || 50;
+export function threePerspectiveCamera(fov = 50, ctx = threeDefaultCtx) {
     var renderer = ctx.renderer;
     var cam = new three.PerspectiveCamera(
         fov,

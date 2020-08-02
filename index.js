@@ -1,5 +1,6 @@
 export * from "./core/index"
 export * from "./fx/index"
+import * as _buildr from "./buildr/index";
 
 
 //export base libs for const instances
@@ -12,3 +13,4 @@ export var vue = _vue;
 export var three = _three;
 export var postprocessing = _postprocessing;
 export var EventEmitter = _ev3.EventEmitter;
+export var buildr = _buildr;
