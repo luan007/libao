@@ -30,7 +30,7 @@ export function threePerspectiveCamera(fov = 50, ctx = threeDefaultCtx) {
     var cam = new three.PerspectiveCamera(
         fov,
         renderer.width / renderer.height,
-        0.01,
+        0.0001,
         2000
     );
     renderer.onResize((width, height) => {
@@ -222,8 +222,8 @@ export function threeTick(ctx = threeDefaultCtx) {
     var rendered = false;
     if (ctx.renderSeq) {
         ctx.renderSeq.forEach((v) => rendered |= !!(v()));
-    } 
-    
+    }
+
     if (!rendered && ctx.camera && ctx.scene && ctx.renderer) {
         ctx.renderer.render(ctx.scene, ctx.camera);
     }

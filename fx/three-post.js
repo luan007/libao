@@ -50,7 +50,7 @@ export var threeFXComposer = ({ skipRenderPass = false }, ctx = threeDefaultCtx)
         return true;
     });
     if (!skipRenderPass) {
-        threeFXRenderPass(ctx);
+        threeFXRenderPass({}, ctx);
     }
     return composer;
 };
@@ -61,10 +61,12 @@ export var threeFXAddPass = (pass, ctx = threeDefaultCtx) => {
     return { pass: pass, params: params, update: () => { } };
 };
 
-export var threeFXRenderPass = (ctx = threeDefaultCtx) => {
-    var pass = new RenderPass(ctx.scene, ctx.camera);
+export var threeFXRenderPass = ({
+    material = null
+}, ctx = threeDefaultCtx) => {
+    var pass = new RenderPass(ctx.scene, ctx.camera, material);
     ctx.composer.addPass(pass);
-    var params = {};
+    var params = { material };
     return { pass: pass, params: params, update: () => { } };
 };
 
@@ -123,7 +125,7 @@ export var threeFXSMAAEffect = ({
     searchImage,
     areaImage
 }, ctx = threeDefaultCtx) => {
-    if(!searchImage && !ctx.fx_smaa_textures) {
+    if (!searchImage && !ctx.fx_smaa_textures) {
         throw "SMAA Effect requires ctx.fx_smaa_textures, load them first or manually set searchImage"
     }
     searchImage = searchImage || ctx.fx_smaa_textures[0];

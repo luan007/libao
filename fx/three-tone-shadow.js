@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { threeDefaultCtx } from "./three-util";
+import { three } from '..';
 const pcss = ({
     frustrum = 3.75,
     size = 0.005,
@@ -134,9 +135,10 @@ export const threeUseToneMapping = ({
     };
 };
 
-export const threeAutoColorMGMT = (ctx = threeDefaultCtx) => {
-    ctx.renderer.outputEncoding = THREE.sRGBEncoding
-    // renderer.gammaOutput = true;
+export const threeAutoColorMGMT = (use_srgb = true, ctx = threeDefaultCtx) => {
+    if (use_srgb) { ctx.renderer.outputEncoding = three.sRGBEncoding }
+    // ctx.renderer.gammaOutput = true;
+    // ctx.renderer.gammaFactor = 2.2;
     // renderer.gammaFactor = 2.2;
     ctx.renderer.physicallyCorrectLights = true;
     threeUseToneMapping({}, ctx);

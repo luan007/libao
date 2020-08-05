@@ -18,6 +18,7 @@ import {
 import { Pass } from "three/examples/jsm/postprocessing/Pass.js";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader.js";
 import { LuminosityHighPassShader } from "three/examples/jsm/shaders/LuminosityHighPassShader.js";
+import { three } from "../..";
 
 /**
  * PatchedUnrealBloomPass  is inspired by the bloom pass of Unreal Engine. It creates a
@@ -42,7 +43,7 @@ var PatchedUnrealBloomPass = function (resolution, strength, radius, threshold, 
 	this.clearColor = new Color(0, 0, 0);
 
 	// render targets
-	var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat, type: HalfFloatType };
+	var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat, encoding: three.sRGBEncoding, type: HalfFloatType };
 	this.renderTargetsHorizontal = [];
 	this.renderTargetsVertical = [];
 	this.nMips = 5;
