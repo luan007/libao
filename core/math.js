@@ -282,13 +282,16 @@ export var ImprovedNoise = function () {
     }
 }
 
+import * as qn from "./lib/cc-fast-noise";
+export var quickNoise = qn.quickNoise.noise;
 
+var curl = [0, 0, 0];
+export function curl3d(x, y, z, eps = 1.0, noise3d = quickNoise) {
+    let n1, n2, a, b;
 
-
-export function curl3d(x, y, z, eps = 1.0, noise3d = n3d) {
-    var n1, n2, a, b;
-    var curl = [0, 0, 0];
-
+    curl[0] = 0;
+    curl[1] = 0;
+    curl[2] = 0;
     n1 = noise3d(x, y + eps, z);
     n2 = noise3d(x, y - eps, z);
 

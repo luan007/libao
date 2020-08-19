@@ -14,3 +14,5 @@ export var three = _three;
 export var postprocessing = _postprocessing;
 export var EventEmitter = _ev3.EventEmitter;
 export var buildr = _buildr;
+
+export * from "./storm/index"

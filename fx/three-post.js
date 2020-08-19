@@ -62,13 +62,20 @@ export var threeFXAddPass = (pass, ctx = threeDefaultCtx) => {
 };
 
 export var threeFXRenderPass = ({
-    material = null
+    material = null,
+    clear = true,
 }, ctx = threeDefaultCtx) => {
     var pass = new RenderPass(ctx.scene, ctx.camera, material);
     ctx.composer.addPass(pass);
-    var params = { material };
+    pass.clear = clear;
+    var params = { material, clear };
     return { pass: pass, params: params, update: () => { } };
 };
+
+
+export var threeFXPreservedRenderPass = ({ material = null }, ctx = threeDefaultCtx) => threeFXRenderPass({ material, clear: false }, ctx)
+
+
 
 export var threeFXUnrealPass = ({
     resolution = new three.Vector2(512, 512),
@@ -110,14 +117,32 @@ export var threeFXEffect = (effect, params) => {
     return { effect: new effect(params), params: params, update: () => { }, is_effect_shell: true };
 }
 
-export var threeFXToneMappingEffect = () => threeFXEffect(postprocessing.ToneMappingEffect, {
-    blendFunction: BlendFunction.NORMAL,
-    adaptive: true,
-    resolution: 256,
-    middleGrey: 0.6,
-    maxLuminance: 16.0,
-    averageLuminance: 1.0,
-    adaptationRate: 3.0
+export var threeFXToneMappingEffect = ({
+    blendFunction = BlendFunction.NORMAL,
+    adaptive = true,
+    resolution = 256,
+    middleGrey = 0.6,
+    maxLuminance = 16.0,
+    averageLuminance = 1.0,
+    adaptationRate = 3.0
+}) => threeFXEffect(postprocessing.ToneMappingEffect, {
+    blendFunction, adaptationRate, resolution, middleGrey, maxLuminance, averageLuminance, adaptive
+});
+
+export var threeFXGammaCorrectionEffect = ({
+    blendFunction = BlendFunction.NORMAL,
+    gamma = 2.0
+}) => threeFXEffect(postprocessing.GammaCorrectionEffect, {
+    blendFunction, gamma
+});
+
+
+export var threeBCHCorrectionEffect = ({
+    blendFunction = BlendFunction.NORMAL,
+    brightness = .0,
+    contrast = .0
+}) => threeFXEffect(postprocessing.BrightnessContrastEffect, {
+    blendFunction, brightness, contrast
 });
 
 export var threeFXSMAAEffect = ({
@@ -135,6 +160,7 @@ export var threeFXSMAAEffect = ({
     };
     const smaaEffect = new SMAAEffect(searchImage, areaImage)
     smaaEffect.colorEdgesMaterial.setEdgeDetectionThreshold(edgeDetection)
+    smaaEffect.applyPreset(postprocessing.SMAAPreset.ULTRA)
     return { effect: smaaEffect, params: params, update: () => { }, is_effect_shell: true };
 };
 

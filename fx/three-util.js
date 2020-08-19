@@ -1,6 +1,6 @@
 import * as three from "three";
 import * as ev from "eventemitter3";
-import { loop } from "../core";
+import { loop, ease } from "../core";
 
 
 var _vec = new three.Vector3();
@@ -11,6 +11,11 @@ export var threeDefaultCtx = {};
 export function threeUseRenderSeq(ctx) {
     ctx.renderSeq = ctx.renderSeq || [];
     return ctx.renderSeq;
+}
+
+export function threeDebugCube() {
+    var m = new three.Mesh(new three.BoxGeometry(1, 1, 1), new three.MeshNormalMaterial());
+    return m;
 }
 
 export function threeScene(ctx = threeDefaultCtx) {
@@ -30,7 +35,7 @@ export function threePerspectiveCamera(fov = 50, ctx = threeDefaultCtx) {
     var cam = new three.PerspectiveCamera(
         fov,
         renderer.width / renderer.height,
-        0.0001,
+        0.01,
         2000
     );
     renderer.onResize((width, height) => {
@@ -58,20 +63,47 @@ export function threeOrthoCamera(scale, ctx = threeDefaultCtx) {
     return cam;
 }
 
-export function threeHalfClearPlane(opacity, ctx = threeDefaultCtx) {
+export function threeHalfClearPlane({ motion_threshold = 0.1, opacity = 0.5, motion = null, color = 0 }, ctx = threeDefaultCtx) {
     var renderer = ctx.renderer;
     renderer.autoClearColor = false;
+
+    console.warn("HalfClearPlane - Reminder - use preserveDrawingBuffer in renderer setup")
+
     var fadeMaterial = new three.MeshBasicMaterial({
-        color: 0x000000,
+        color: color,
         transparent: true,
-        opacity: opacity
+        opacity: opacity,
+        side: three.DoubleSide,
     });
     var fadePlane = new three.PlaneBufferGeometry(15555, 15555);
     var fadeMesh = new three.Mesh(fadePlane, fadeMaterial);
     // Put plane in front of camera
-    fadeMesh.position.z = -1;
+    fadeMesh.position.z = -0.1;
     // Make plane render before particles
     fadeMesh.renderOrder = -1;
+
+    var pre = new three.Vector3(1, 0, 0);
+    var comp = new three.Vector3(1, 0, 0);
+
+    if (Array.isArray(opacity) || motion != null) {
+        var c = 0;
+        opacity = Array.isArray(opacity) ? opacity : [opacity];
+        loop(() => {
+            pre.set(1, 0, 0);
+            fadeMesh.localToWorld(pre);
+            if (comp.distanceTo(pre) > motion_threshold) {
+                fadeMaterial.opacity = ease(fadeMaterial.opacity, (motion ? motion : 1), 0.1, 0.00001);
+                comp.copy(pre);
+            }
+            else {
+                fadeMaterial.opacity = opacity[c]
+                c++;
+                if (c >= opacity.length) {
+                    c = 0;
+                }
+            }
+        });
+    }
     return fadeMesh;
 }
 
@@ -155,7 +187,8 @@ export var threeRendererCfg_HighPerf_PostFX = {
     powerPreference: "high-performance",
     antialias: false,
     stencil: false,
-    depth: false
+    depth: false,
+    preserveDrawingBuffer: false
 };
 
 export function threeRenderer({
@@ -168,11 +201,14 @@ export function threeRenderer({
     clearColor = 0,
     canvas = null,
     autoClearColor = true,
+    preserveDrawingBuffer = true,
     alpha = 1,
     dpi = window.devicePixelRatio
 }, ctx = threeDefaultCtx) {
     var e = new ev.EventEmitter();
-    var renderer = new three.WebGLRenderer(arguments[0]);
+    var renderer = new three.WebGLRenderer({
+        ...arguments[0]
+    });
     renderer.autoSize = autoSize;
     renderer.setClearColor(clearColor, alpha);
     renderer.setPixelRatio(dpi);
@@ -233,4 +269,55 @@ export function threeLoop(ctx = threeDefaultCtx) {
     loop(() => {
         threeTick(ctx);
     });
+}
+
+
+export function threeLoadTexture(path, key = 'Texture_' + Math.random(), ctx = threeDefaultCtx) {
+    ctx.resources = ctx.resources || {};
+    ctx.resources[key] = (new three.TextureLoader()).load(path)
+    return ctx.resources[key];
+}
+
+export async function threeLoadTextureAsync(path, key = 'Texture_' + Math.random(), ctx = threeDefaultCtx) {
+    ctx.resources = ctx.resources || {};
+    ctx.resources[key] = await (new three.TextureLoader()).loadAsync(path)
+    return ctx.resources[key];
+}
+
+
+export function threeLoadCubeTexture(urls, key = 'CubeTexture_' + Math.random(), ctx = threeDefaultCtx) {
+    ctx.resources = ctx.resources || {};
+    ctx.resources[key] = (new three.CubeTextureLoader()).load(urls)
+    return ctx.resources[key];
+}
+
+export async function threeLoadCubeTextureAsync(urls, key = 'CubeTexture_' + Math.random(), ctx = threeDefaultCtx) {
+    ctx.resources = ctx.resources || {};
+    ctx.resources[key] = await (new three.CubeTextureLoader()).loadAsync(urls)
+    return ctx.resources[key];
+}
+
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader"
+
+export function threeLoadObj(url, key = 'Obj_' + Math.random(), ctx = threeDefaultCtx, cb) {
+    ctx.resources = ctx.resources || {};
+    cb = cb || (() => { });
+    (new OBJLoader()).load(url, (obj) => {
+        ctx.resources[key] = obj;
+        cb(obj);
+    })
+}
+
+export async function threeLoadObjAsync(url, key = 'Obj_' + Math.random(), ctx = threeDefaultCtx) {
+    ctx.resources = ctx.resources || {};
+    ctx.resources[key] = await (new OBJLoader()).loadAsync(url);
+    return ctx.resources[key]
+}
+
+
+
+export function threeInstancedGeometry(geo) {
+    geo.computeBoundingBox();
+    geo.center();
+    return (new three.InstancedBufferGeometry()).copy(geo)
 }

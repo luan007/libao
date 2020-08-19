@@ -6,7 +6,7 @@ export function threeOrbitControl({
     domElement = null,
     minDistance = 0,
     maxDistance = Infinity,
-
+    object = null,
     minZoom = 0,
     maxZoom = Infinity,
 
@@ -66,9 +66,9 @@ export function threeOrbitControl({
         autoRotateSpeed,
         target,
         camPos,
-        object: ctx.camera
+        object
     };
-    params.object = ctx.camera;
+    params.object = params.object || ctx.camera;
 
     function apply(params) {
         for (var i in params) {
@@ -80,7 +80,7 @@ export function threeOrbitControl({
         }
         controls.update();
     }
-    ctx.camera.position.set(params.camPos.x, params.camPos.y, params.camPos.z);
+    params.object.position.set(params.camPos.x, params.camPos.y, params.camPos.z);
     controls.update();
     threeUseRenderSeq(ctx).push(() => {
         controls.update();
