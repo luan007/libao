@@ -22,6 +22,33 @@ export function vec3_fx_curl(x, y, z, eps) {
     return curl3d(x, y, z, eps);
 }
 
+export function vec3_fx_attract_force(a, pos, attractor, G = 1, lim_d = 0.001) {
+    //gm1m2 / r2
+    var scaleF = -G / Math.max(lim_d, storm.vec.sqrDist(pos, attractor)); //just in case
+    //vectorF = normalize(attractor - pos) * scaleF
+    var dir = storm.vec.set(N3BUF, 0, 0, 0);
+    storm.vec.scaleAndAdd(a, a,
+        storm.vec.normalize(dir,
+            storm.vec.sub(dir, pos, attractor)
+        ),
+        scaleF);
+    return a;
+}
+
+export function vec3_fx_ease_force(a, from, to, lim_max = 10, factor = 0.1, constant) {
+    //gm1m2 / r2
+    var dir = storm.vec.set(N3BUF, 0, 0, 0);
+    storm.vec.sub(dir, to, from);
+    var len = constant || storm.vec.len(dir) * factor;
+    if(lim_max > 0) {
+        len = len > lim_max ? lim_max : len;
+    }
+    storm.vec.scaleAndAdd(a, a,
+        storm.vec.normalize(dir, dir),
+        len);
+    return a;
+}
+
 export function vec3_fx_perlin3(x, y, z) {
     N3BUF[0] = n3d(-x, y, z);
     N3BUF[1] = n3d(y, -x, z);
@@ -55,6 +82,8 @@ export function vec3_fx_scale(target, s) {
     storm.vec.scale(target, target, s);
     return target;
 }
+
+export var vec3_fx_damper = vec3_fx_scale;
 
 export function attach_fx_curl_rotation_force(runtime, {
     stage = 'a', target = 'a', grouping = 5,
@@ -110,7 +139,7 @@ export function attach_fx_damper(runtime, {
         let damp = damper_overriden ? p[params.damper] : params.damper;
         let lim = limit_overriden ? p[params.limit] : params.limit;
         if (damp != -1) {
-            storm.vec.scale(p[params.target], p[params.target], damp);
+            vec3_fx_damper(p[params.target], damp);
         }
         if (lim != -1) {
             vec3_fx_limit(p[params.target], lim);

@@ -8,6 +8,8 @@
 import * as glMatrix from "gl-matrix";
 import { loop } from "../core";
 
+const MIN_FPS_INT = 1 / 20 * 1000;
+
 export var vec2 = glMatrix.vec2;
 export var vec3 = glMatrix.vec3;
 export var vec = glMatrix.vec3;
@@ -109,6 +111,7 @@ export function form(capacity = 1000) {
             if (!runtime._built) throw 'Please call engine.build() before first action';
             runtime.t = t || (Date.now() / 1000);
             runtime.dt = dt || (runtime.t - (runtime.prevT || runtime.t));
+            runtime.dt = runtime.dt > MIN_FPS_INT ? MIN_FPS_INT : runtime.dt; //limit this to reasonable value, or verlet will crash
             runtime.prevT = runtime.t;
 
             runtime.t *= runtime.time_mult;

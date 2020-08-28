@@ -35,7 +35,7 @@ export function threePerspectiveCamera(fov = 50, ctx = threeDefaultCtx) {
     var cam = new three.PerspectiveCamera(
         fov,
         renderer.width / renderer.height,
-        0.01,
+        0.0001,
         2000
     );
     renderer.onResize((width, height) => {
@@ -176,6 +176,17 @@ export function threeEaseMat(m1, m2, e, p) {
     return d;
 }
 
+export function threeEaseQuat(q1, q2, e = 0.1, p = 0.00001) {
+    q1.slerp(q2, e);
+}
+
+export function threeEaseQuatRaw(q1, q2, e = 0.1, p = 0.00001) {
+    q1.x = ease(q1.x, q2.x, e, p);
+    q1.y = ease(q1.y, q2.y, e, p);
+    q1.z = ease(q1.z, q2.z, e, p);
+    q1.w = ease(q1.w, q2.w, e, p);
+}
+
 export function threeLerpMat(mtarget, mfrom, mto, j) {
     for (var el = 0; el < mtarget.elements.length; el++) {
         mtarget.elements[el] =
@@ -213,6 +224,7 @@ export function threeRenderer({
     renderer.setClearColor(clearColor, alpha);
     renderer.setPixelRatio(dpi);
     canvas = canvas || ctx.canvas;
+    renderer.emit = e.emit.bind(e);
     function fit(w, h) {
         renderer.setSize(w, h);
         renderer.height = h;

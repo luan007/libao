@@ -260,3 +260,8 @@ export function changed(key, cur) {
 
 loop(_update_eased);
 loop(_update_springs);
+
+
+export function emp_parabola(val) {
+    return 1 - Math.pow(1 - 2 * val, 2);
+}
