@@ -1,4 +1,5 @@
 export * from "./core/index"
+export * from "./data/index"
 export * from "./ux/index"
 export * from "./fx/index"
 import * as _buildr from "./buildr/index";

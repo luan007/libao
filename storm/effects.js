@@ -187,7 +187,7 @@ export function attach_eased_vec3(runtime, {
     });
 
     var r = Math.random();
-    var key = "ease_" + r;
+    key = "ease_" + r; //TODO:FIX THIS
     if (grouping >= 1) {
         storm.attach_perf_tag(runtime, key, { groups: grouping });
         storm.on(runtime, params.stage, (p) => {
