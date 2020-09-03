@@ -1,4 +1,4 @@
-export function denote(str) {
+export function denote(str, ops) {
     var ops = {
         sk: "<", //start key
         ak: "+", //append key

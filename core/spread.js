@@ -8,3 +8,4 @@ export function forSphere(count, cb = (deg, i, count) => { }) {
         // cb(i / count * Math.PI * 2, i, count);
     }
 }
+

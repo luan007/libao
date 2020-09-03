@@ -19,3 +19,10 @@ export function eventPub() {
     }
     return trigger;
 }
+
+
+export function asyncDelay(time_ms) {
+    return new Promise((res) => {
+        setTimeout(res, time_ms);
+    });
+}

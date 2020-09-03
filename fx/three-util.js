@@ -333,3 +333,9 @@ export function threeInstancedGeometry(geo) {
     geo.center();
     return (new three.InstancedBufferGeometry()).copy(geo)
 }
+
+export function threeGroup(gcb = (g) => { }) {
+    var g = new three.Group();
+    gcb(g);
+    return g;
+}

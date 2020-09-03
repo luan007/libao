@@ -87,6 +87,11 @@ export function Promise_Queue(return_promise, _queue_name) {
     return promise;
 }
 
+export async function fetchJSONAsync(v) {
+    var q = await fetch(v);
+    return await q.json();
+}
+
 export function fetchJSON(v, cb) {
     var key = v.split('/').pop().replace(/\.json/gi, "");
     return fetch(v).then((r) => {

@@ -330,3 +330,37 @@ export function curl3d(x, y, z, eps = 1.0, noise3d = quickNoise) {
 
     return curl;
 }
+
+
+export function genSpiralArr2d(edge) {
+    var arr = Array(edge),
+        x = 0, y = edge,
+        total = edge * edge--,
+        dx = 1, dy = 0,
+        i = 0, j = 0;
+    while (y) arr[--y] = [];
+    while (i < total) {
+        arr[y][x] = (total - 1 - i++);
+        x += dx; y += dy;
+        if (++j == edge) {
+            if (dy < 0) { x++; y++; edge -= 2 }
+            j = dx; dx = -dy; dy = j; j = 0;
+        }
+    }
+    return arr;
+}
+
+export function genSpiralArr_Vec2(edge) {
+    var arr = genSpiralArr2d(edge)
+    var flat = [];
+    for (var y = 0; y < edge; y++) {
+        for (var x = 0; x < edge; x++) {
+            flat.push({
+                x: x - edge / 2,
+                y: y - edge / 2,
+                id: arr[y][x]
+            })
+        }
+    }
+    return flat.sort((a, b) => a.id - b.id);
+}
