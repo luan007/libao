@@ -26,4 +26,5 @@ export var buildr = _buildr;
 export * from "./storm/index"
 export * from "./dom/index"
 export * from "./glue/glue"
+export * from "./glue/adaptors"
 import "./dom/*.less";

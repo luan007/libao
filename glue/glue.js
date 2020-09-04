@@ -1,6 +1,5 @@
 import { vue } from "..";
 import { EventEmitter2 as EventEmitter } from "eventemitter2";
-
 //confused? take a look @readme
 //glue v0 - pretty rough now - not production ready 
 
@@ -39,7 +38,7 @@ export function glueValue(v, meta) {
     }; //does nothing basically
 }
 
-function _glue_register_value(key, o, i, meta) {
+function _glue_register_value(key, o, i, meta = {}) {
     Object.defineProperty(glueRouter, key, {
         get() {
             return o[i]
@@ -48,31 +47,37 @@ function _glue_register_value(key, o, i, meta) {
             o[i] = value;
         }
     })
-    glueDef[key] = {
-        type: "value",
-        path: key,
-        target: o,
-        key: i
-    };
-    vue.watch(() => o[i], (new_val, old_val) => {
-        //changed
+
+    function emit(new_val, old_val) {
+        new_val = new_val || o[i];
+        old_val = old_val || o[i];
         glueEv.emit(key, {
             path: key,
             new_val: new_val,
             old_val: old_val,
             type: "value_changed"
         });
+    }
+
+    vue.watch(() => o[i], (new_val, old_val) => {
+        //changed
+        emit(new_val, old_val)
     });
 
-    glueEv.emit(key, {
+    glueDef[key] = {
+        type: "value",
         path: key,
-        new_val: o[i],
-        old_val: o[i],
-        type: "value_changed"
-    });
+        value: o[i],
+        // target: o,
+        // key: i,
+        meta: meta,
+        emit: emit.bind(null, o[i], o[i])
+    };
+    emit(o[i], o[i]);
+
 }
 
-function _glue_register_ev(key, o, i, meta) {
+function _glue_register_ev(key, o, i, meta = {}) {
     var obj = (data) => {
         glueEv.emit(key, {
             path: key,
@@ -92,7 +97,8 @@ function _glue_register_ev(key, o, i, meta) {
     glueDef[key] = {
         type: "event",
         path: key,
-        emitter: obj
+        emitter: obj,
+        meta: meta
     };
     Object.defineProperty(glueRouter, key, {
         get() {
@@ -113,9 +119,8 @@ function _glue_register_ev(key, o, i, meta) {
     })
 }
 
-function _glue_register_action(key, o, i, meta) {
+function _glue_register_action(key, o, i, meta = {}) {
     //wrap ball
-    console.log(o[i]);
     o[i] = o[i].bind(o, o);
     Object.defineProperty(glueRouter, key, {
         get() {
@@ -125,7 +130,8 @@ function _glue_register_action(key, o, i, meta) {
     glueDef[key] = {
         type: "action",
         path: key,
-        action: o[i]
+        action: o[i],
+        meta: meta
     };
 }
 
@@ -278,3 +284,17 @@ export function glued(inobj, key, path) {
     return inobj;
 }
 
+
+
+//TODO check if path is valid
+export function glueApplyControl(d) {
+    if (d.type == "value_set") {
+        return glueValueSet(d.path, d.new_val);
+    }
+    if (d.type == "action") {
+        return glueActionCall(d.path, d.args);
+    }
+    if (d.type == "event") {
+        return glueEventEmit(d.path, d.data);
+    }
+}
