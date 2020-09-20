@@ -7,4 +7,5 @@ export * from "./three-magic-textures";
 export * from "./three-extra-geometry";
 export * from "./three-shader";
 export * from "./three-composite-materials";
+export * from "./vue2-util";
 export * from "./canvas2d";

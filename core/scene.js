@@ -9,7 +9,7 @@ var scene_groups = {};
 
 export class Scene {
     constructor(updateFunc, grpId, id, updateThreshold, init) {
-        init = init || ((s) => {});
+        init = init || ((s) => { });
         grpId = grpId || "default";
         if (grpId) {
             scene_groups[grpId] = scene_groups[grpId] || [];
@@ -19,11 +19,13 @@ export class Scene {
         this.visibility = eased(0, 0, 0.2, 0.00001);
         this.updateThreshold = updateThreshold || 0.001;
         this.id = id;
-        this.update = updateFunc || (() => {});
+        this.update = updateFunc || (() => { });
         init(this);
+        this.prev_viz = this.visibility.to;
         loop((t, dt) => {
             if (this.visibility.value > this.updateThreshold) {
-                this.update(t, dt, this);
+                this.update(t, dt, this, this.visibility.to != this.prev_viz);
+                this.prev_viz = this.visibility.to;
             }
         });
     }

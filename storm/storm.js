@@ -7,6 +7,7 @@
 
 import * as glMatrix from "gl-matrix";
 import { loop } from "../core";
+import { three } from "../"
 
 const MIN_FPS_INT = 1 / 20 * 1000;
 
@@ -48,6 +49,7 @@ export function form(capacity = 1000) {
         postprocess: [],//when enabled, called for each particle no matter real of fake
         kill: []        //called for each particle (on_kill)
     };
+    var clock = new three.Clock();
     var runtime = {
         t: 0,
         dt: 0,
@@ -109,16 +111,16 @@ export function form(capacity = 1000) {
         },
         tick: function (t, dt) {
             if (!runtime._built) throw 'Please call engine.build() before first action';
-            runtime.t = t || (Date.now() / 1000);
-            runtime.dt = dt || (runtime.t - (runtime.prevT || runtime.t));
-            runtime.dt = runtime.dt > MIN_FPS_INT ? MIN_FPS_INT : runtime.dt; //limit this to reasonable value, or verlet will crash
-            runtime.prevT = runtime.t;
+            runtime.t = clock.elapsedTime
+            runtime.dt = Math.min(1 / 30, clock.getDelta());
+
+            // runtime.dt = runtime.dt > MIN_FPS_INT ? MIN_FPS_INT : runtime.dt; //limit this to reasonable value, or verlet will crash
+            // runtime.prevT = runtime.t;
 
             runtime.t *= runtime.time_mult;
             runtime.dt *= runtime.time_mult;
             // runtime.prevT *= runtime.time_mult;
 
-            runtime.updated = 0;
             for (var i = 0; i < capacity; i++) { //O(n) but not perfect
                 if (!alive[i]) continue; //cost too much, maybe - but for now it seems enough
                 let p = container[i];
@@ -176,6 +178,7 @@ export function attach_avp(runtime) {
         p.p[1] += p.v[1] * dt;
         p.p[2] += p.v[2] * dt;
         runtime_run_pgm_on_index(runtime, i, p, runtime.program.p, 'p')
+
     });
 
     return params;
@@ -215,12 +218,12 @@ export function attach_rarvr(runtime) {
     return params;
 }
 
-export function attach_looper(runtime, time_mult = 1) {
+export function attach_looper(runtime, time_mult = 1, loop = loop) {
     runtime.time_mult = time_mult;
     function tick() {
         runtime.tick();
     }
-    loop(tick);
+    loop && loop(tick);
     return tick;
 }
 

@@ -327,6 +327,7 @@ export var threeFXSSAOEffect = ({
     bias = 0.05,
     intensity = 10,
     fade = 0.001,
+    resolutionScale = 1,
     color = new three.Color(1, 0, 0)
 }, ctx = threeDefaultCtx) => {
     if (!ctx.composer_normal_pass) {
@@ -336,10 +337,12 @@ export var threeFXSSAOEffect = ({
         blendFunction, samples, rings, distanceThreshold,
         distanceFalloff, rangeThreshold, rangeFalloff,
         luminanceInfluence, radius, scale, bias, intensity,
+        resolutionScale,
         fade, color
     };
     const ssaoEffect = new SSAOEffect(ctx.camera, ctx.composer_normal_pass.renderTarget.texture,
         params);
+    console.log(ssaoEffect);
     return { effect: ssaoEffect, params: params, update: () => { }, is_effect_shell: true };
 };
 

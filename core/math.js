@@ -18,6 +18,14 @@ export function clamp(v, a, b) {
     return v < a ? a : (v > b ? b : v);
 }
 
+export function sround(v, i) {
+    return (Math.round(v * i) / i)
+}
+
+export function segrand(i) {
+    return (Math.round(Math.random() * i) / i)
+}
+
 export function crand(range, off) {
     range = range || 0.5;
     off = off || 0;

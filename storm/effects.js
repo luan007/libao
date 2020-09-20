@@ -22,9 +22,11 @@ export function vec3_fx_curl(x, y, z, eps) {
     return curl3d(x, y, z, eps);
 }
 
-export function vec3_fx_attract_force(a, pos, attractor, G = 1, lim_d = 0.001) {
+export function vec3_fx_attract_force(a, pos, attractor, G = 1, lim_d = 0.001, skip_inside = true) {
     //gm1m2 / r2
-    var scaleF = -G / Math.max(lim_d, storm.vec.sqrDist(pos, attractor)); //just in case
+    var dist = storm.vec.sqrDist(pos, attractor);
+    if(skip_inside && dist < lim_d) return a; //dont act
+    var scaleF = -G / Math.max(lim_d, dist); //just in case
     //vectorF = normalize(attractor - pos) * scaleF
     var dir = storm.vec.set(N3BUF, 0, 0, 0);
     storm.vec.scaleAndAdd(a, a,
@@ -40,6 +42,7 @@ export function vec3_fx_ease_force(a, from, to, lim_max = 10, factor = 0.1, cons
     var dir = storm.vec.set(N3BUF, 0, 0, 0);
     storm.vec.sub(dir, to, from);
     var len = constant || storm.vec.len(dir) * factor;
+    if(len < 0.00001) return a;
     if(lim_max > 0) {
         len = len > lim_max ? lim_max : len;
     }
@@ -99,7 +102,6 @@ export function attach_fx_curl_rotation_force(runtime, {
     var rnd = Math.random();
     var key = 'curl_' + rnd;
     storm.attach_perf_tag(runtime, key, { groups: grouping })
-
     function update(p) {
         if (!storm.has_perf_tag(key, runtime, p)) {
             return;

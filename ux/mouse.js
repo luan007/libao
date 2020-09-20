@@ -1,4 +1,5 @@
 import { vue } from "..";
+import { domElementXYRect, domElementXY, domPageXYtoElementXY } from "../fx/dom";
 
 export function mouseInput(domElement = document.body, mount = {
     absX: 0,
@@ -10,6 +11,8 @@ export function mouseInput(domElement = document.body, mount = {
     focus: 0,
     hover: 0,
 
+    wheelY: 0,
+    wheelDeltaY: 0,
     acc_drag: {
         x: 0,
         y: 0,
@@ -23,6 +26,7 @@ export function mouseInput(domElement = document.body, mount = {
         result: null
     }
 }) {
+
     var _prevX = 0;
     var _prevY = 0;
     function start_drag(e) {
@@ -66,35 +70,103 @@ export function mouseInput(domElement = document.body, mount = {
         mount.hover = (mount.focus && !mount.pressed) ? 1 : 0;
     }
     domElement.addEventListener("mouseenter", (e) => {
+        if (e.currentTarget != domElement) return false;
         mount.focus = 1;
         compute_hover();
-    });
+    }, true);
     domElement.addEventListener("mouseleave", (e) => {
+        if (e.currentTarget != domElement) return false;
         mount.focus = 0;
         stop_drag(true);
         mount.hover = (mount.focus && !mount.pressed) ? 1 : 0;
-    });
+    }, true);
     domElement.addEventListener("mousemove", (e) => {
-        var w = e.srcElement.clientWidth;
-        var h = e.srcElement.clientHeight;
+        if (e.currentTarget != domElement) return false;
+        // e.preventDefault();
+        var epos = domElementXYRect(domElement);
+        var abspos = domPageXYtoElementXY(e.pageX, e.pageY, domElement);
+        var w = epos.w;
+        var h = epos.h;
         w = w || window.innerWidth;
         h = h || window.innerHeight;
-        mount.absX = e.offsetX;
-        mount.absY = e.offsetY;
-        mount.x = e.offsetX / w;
-        mount.y = e.offsetY / h;
+        mount.absX = abspos.x;
+        mount.absY = abspos.y;
+        mount.x = mount.absX / w;
+        mount.y = mount.absY / h;
         compute_drag();
-    });
+    }, true);
     domElement.addEventListener("mousedown", (e) => {
+        if (e.currentTarget != domElement) return false;
         mount.pressed = 1;
         compute_hover();
         start_drag(e);
-    });
+    }, true);
     domElement.addEventListener("mouseup", (e) => {
+        if (e.currentTarget != domElement) return false;
         mount.pressed = 0;
         compute_hover();
         stop_drag();
-    });
+    }, true);
+
+    domElement.addEventListener("touchmove", (e) => {
+        // e.preventDefault();
+        if (e.currentTarget != domElement) return false;
+        var epos = domElementXYRect(domElement);
+        var abspos = domPageXYtoElementXY(e.touches[0].pageX, e.touches[0].pageY, domElement);
+        var w = epos.w;
+        var h = epos.h;
+        w = w || window.innerWidth;
+        h = h || window.innerHeight;
+        mount.absX = abspos.x;
+        mount.absY = abspos.y;
+        mount.x = mount.absX / w;
+        mount.y = mount.absY / h;
+        // e.preventDefault(true);
+        compute_drag();
+    }, true);
+    domElement.addEventListener("touchstart", (e) => {
+        if (e.currentTarget != domElement) return false;
+        mount.pressed = 1;
+        // var w = domElement.clientWidth;
+        // var h = domElement.clientHeight;
+        // w = w || window.innerWidth;
+        // h = h || window.innerHeight;
+        // mount.absX = e.touches[0].screenX;
+        // mount.absY = e.touches[0].screenY;
+        // mount.x = mount.absX / w;
+        // mount.y = mount.absY / h;
+
+
+
+        var epos = domElementXYRect(domElement);
+        var abspos = domPageXYtoElementXY(e.touches[0].pageX, e.touches[0].pageY, domElement);
+        var w = epos.w;
+        var h = epos.h;
+        w = w || window.innerWidth;
+        h = h || window.innerHeight;
+        mount.absX = abspos.x;
+        mount.absY = abspos.y;
+        mount.x = mount.absX / w;
+        mount.y = mount.absY / h;
+
+        // // compute_hover();
+        // // e.preventDefault();
+        start_drag(e);
+    }, true);
+    domElement.addEventListener("touchend", (e) => {
+        if (e.currentTarget != domElement) return false;
+        mount.pressed = 0;
+        // compute_hover();
+        e.preventDefault();
+        stop_drag();
+    }, true);
+
+
+    domElement.addEventListener("wheel", (e) => {
+        mount.wheelDeltaY = e.deltaY;
+        mount.wheelY += e.deltaY;
+    })
+
     return mount;
 }
 
@@ -110,6 +182,8 @@ export function mouseInputVueReactive(domElement = document.body, mount = vue.re
     dragging: 0,
     focus: 0,
     hover: 0,
+    wheelY: 0,
+    wheelDeltaY: 0,
     acc_drag: {
         x: 0,
         y: 0,

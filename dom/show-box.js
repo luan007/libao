@@ -1,11 +1,18 @@
+import { runtimeEnv } from "../core/store";
+
 export function domMakeShowBox({
     el = "#ao-showbox",
     scaler = 0.8,
-    production = false,
+    production = null,
     autoCenter_production = true
 }) {
     var d = document.querySelector(el);
     var child = d.children.item(0);
+
+    //deduce from env
+    if(production == null) {
+        production = !!runtimeEnv('production')
+    }
 
     if (production) {
         d.style.transformOrigin = "0% 0%";

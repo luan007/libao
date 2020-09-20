@@ -1,7 +1,9 @@
 import * as three from "three";
 import * as ev from "eventemitter3";
 import { loop, ease } from "../core";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
+export * from "three/examples/jsm/modifiers/SubdivisionModifier"
 
 var _vec = new three.Vector3();
 var calc_vec = new three.Vector3();
@@ -209,6 +211,7 @@ export function threeRenderer({
     height = 0,
     autoSize = true,
     transparency = true,
+    localClippingEnabled = false,
     clearColor = 0,
     canvas = null,
     autoClearColor = true,
@@ -225,6 +228,7 @@ export function threeRenderer({
     renderer.setPixelRatio(dpi);
     canvas = canvas || ctx.canvas;
     renderer.emit = e.emit.bind(e);
+    console.log('Initializing ao-three', arguments[0]);
     function fit(w, h) {
         renderer.setSize(w, h);
         renderer.height = h;
@@ -251,6 +255,7 @@ export function threeRenderer({
         });
     }
 
+    renderer.localClippingEnabled = localClippingEnabled;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = three.PCFSoftShadowMap; // default THREE.PCFShadowMap
     ctx.renderer = renderer;
@@ -290,9 +295,16 @@ export function threeLoadTexture(path, key = 'Texture_' + Math.random(), ctx = t
     return ctx.resources[key];
 }
 
-export async function threeLoadTextureAsync(path, key = 'Texture_' + Math.random(), ctx = threeDefaultCtx) {
+export async function threeLoadTextureAsync(path, key = 'GLTF_' + Math.random(), ctx = threeDefaultCtx) {
     ctx.resources = ctx.resources || {};
     ctx.resources[key] = await (new three.TextureLoader()).loadAsync(path)
+    return ctx.resources[key];
+}
+
+
+export async function threeLoadGLTFAsync(path, key = 'Texture_' + Math.random(), ctx = threeDefaultCtx) {
+    ctx.resources = ctx.resources || {};
+    ctx.resources[key] = await (new GLTFLoader()).loadAsync(path)
     return ctx.resources[key];
 }
 
@@ -338,4 +350,44 @@ export function threeGroup(gcb = (g) => { }) {
     var g = new three.Group();
     gcb(g);
     return g;
+}
+
+
+export function epsilon(value) {
+
+    return Math.abs(value) < 1e-10 ? 0 : value;
+
+}
+
+export function threeMATtoCSSMAT(matrix) {
+
+    var elements = matrix.elements;
+    var matrix3d = 'matrix3d(' +
+        epsilon(elements[0]) + ',' +
+        epsilon(elements[1]) + ',' +
+        epsilon(elements[2]) + ',' +
+        epsilon(elements[3]) + ',' +
+        epsilon(- elements[4]) + ',' +
+        epsilon(- elements[5]) + ',' +
+        epsilon(- elements[6]) + ',' +
+        epsilon(- elements[7]) + ',' +
+        epsilon(elements[8]) + ',' +
+        epsilon(elements[9]) + ',' +
+        epsilon(elements[10]) + ',' +
+        epsilon(elements[11]) + ',' +
+        epsilon(elements[12]) + ',' +
+        epsilon(elements[13]) + ',' +
+        epsilon(elements[14]) + ',' +
+        epsilon(elements[15]) +
+        ')';
+
+    // if (isIE) {
+    //     return 'translate(-50%,-50%)' +
+    //         'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
+    //         cameraCSSMatrix +
+    //         matrix3d;
+
+    // }
+
+    return 'translate(-50%,-50%)' + matrix3d;
 }

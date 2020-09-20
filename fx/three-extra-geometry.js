@@ -547,3 +547,5 @@ export var RoundedBoxGeometry = function (
 RoundedBoxGeometry.prototype = Object.create(three.BufferGeometry.prototype);
 RoundedBoxGeometry.constructor = RoundedBoxGeometry;
 
+
+

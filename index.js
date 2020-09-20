@@ -4,19 +4,20 @@ import "regenerator-runtime/runtime";
 //according to https://stackoverflow.com/questions/53558916/babel-7-referenceerror-regeneratorruntime-is-not-defined
 
 export * from "./core/index"
-export * from "./data/index"
 export * from "./ux/index"
 export * from "./fx/index"
-import * as _buildr from "./buildr/index";
+import * as _buildr from "./prototyping/buildr/index";
 
 //export base libs for const instances
 import * as _vue from "vue";
+import _vue2 from "vue2";
 import _p5 from "p5";
 import * as _three from "three";
 import * as _postprocessing from "postprocessing";
 import * as _ev3 from "eventemitter3";
 
 export var vue = _vue;
+export var Vue = _vue2;
 export var p5 = _p5;
 export var three = _three;
 export var postprocessing = _postprocessing;
@@ -27,4 +28,5 @@ export * from "./storm/index"
 export * from "./dom/index"
 export * from "./glue/glue"
 export * from "./glue/adaptors"
+export * from "./glue/gasset"
 import "./dom/*.less";
