@@ -9,8 +9,8 @@ export * from "./fx/index"
 import * as _buildr from "./prototyping/buildr/index";
 
 //export base libs for const instances
-import * as _vue from "vue";
-import _vue2 from "vue2";
+import * as _vue from "vue3";
+import _vue2 from "vue";
 import _p5 from "p5";
 import * as _three from "three";
 import * as _postprocessing from "postprocessing";

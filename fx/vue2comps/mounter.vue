@@ -1,6 +1,6 @@
 <template>
 <div class="ao-mounter">
-    <component v-for="q in ui" :is="q.kind" v-bind="q" v-bind:key="q ? Math.random() : ''"></component>
+    <component v-for="q in ui" :is="q.kind" v-bind="q"></component>
 </div>
 </template>
 

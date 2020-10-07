@@ -1,3 +1,5 @@
+import Stats from "stats.js";
+
 //tiny updatez
 const PRECISION = 0.0001;
 var deltaT = 0;
@@ -223,17 +225,27 @@ export function noLoop(func_or_obj) {
     removal.push(func);
 }
 
+var stats = new Stats();
+
+export function looperShowFPS(mode = 0) {
+    stats.showPanel(mode); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild(stats.dom);
+}
+
 export function looperStart(grab_raf, lim_t) {
     var raf = global.requestAnimationFrame;
     if (grab_raf) {
+        console.warn("RAF has been replaced by nonsense by libao. Use loop() from now /");
         global.requestAnimationFrame = () => {
             console.warn("Some Library is causing trouble. RAF HAS BEEN GRABBED BY LOOPER_START from AO for code const perf")
         }
     }
     LIMIT_T = lim_t;
     var _updator_thread = function () {
+        stats.begin();
         raf(_updator_thread);
         tick();
+        stats.end();
     };
     _updator_thread();
 }

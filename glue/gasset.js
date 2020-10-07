@@ -35,6 +35,11 @@ export function gasset(path, transformer, fetch_factory, meta_factory = () => ({
     return shell.core;
 }
 
+export function gfetch(url, transformer = (d) => d, type = 'json') {
+    return gasset(url, transformer, async (d) => {
+        return await (await fetch(d.path))[type]();
+    });
+}
 
 //put this into asset mgmt pipeline & gives url transformation cap
 export function gstatic(url, promise_factory) {

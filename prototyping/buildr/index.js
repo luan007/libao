@@ -1,4 +1,4 @@
-import * as vue from "vue/dist/vue.esm-bundler.js";
+import { vue } from "../../"
 import * as _lite from "./lite";
 
 export const VERSION = '0-A';

@@ -20,6 +20,10 @@ export function threeDebugCube() {
     return m;
 }
 
+/**
+ * @param {*} ctx 
+ * @returns {three.Scene}
+ */
 export function threeScene(ctx = threeDefaultCtx) {
     ctx.scene = new three.Scene();
     return ctx.scene;
@@ -31,6 +35,7 @@ export function threeLocalToWorldNoModify(obj3d, vec) {
     _vec.z = vec.z;
     return obj3d.localToWorld(_vec);
 }
+
 
 export function threePerspectiveCamera(fov = 50, ctx = threeDefaultCtx) {
     var renderer = ctx.renderer;
