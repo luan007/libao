@@ -274,6 +274,6 @@ loop(_update_eased);
 loop(_update_springs);
 
 
-export function emp_parabola(val) {
-    return 1 - Math.pow(1 - 2 * val, 2);
+export function emp_parabola(val, power = 2) {
+    return 1 - Math.pow(1 - 2 * val, power);
 }

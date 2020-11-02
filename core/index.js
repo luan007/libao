@@ -7,3 +7,4 @@ export * from "./net";
 export * from "./spread";
 export * from "./segments";
 export * from "./denote/text"
+export * from "./store";

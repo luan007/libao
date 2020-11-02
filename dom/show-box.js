@@ -1,16 +1,36 @@
 import { runtimeEnv } from "../core/store";
 
+export function domCSSVar(key, value) {
+    let root = document.documentElement;
+    root.style.setProperty('--' + key, value);
+}
+
+export function domCSSVars(kv) {
+    let root = document.documentElement;
+    for (var i in kv) {
+        root.style.setProperty('--' + i, kv[i]);
+    }
+}
+
+export function domUseFixedWH(w, h) {
+    domCSSVars({
+        w: w + "px",
+        h: h + "px"
+    });
+}
+
 export function domMakeShowBox({
     el = "#ao-showbox",
     scaler = 0.8,
     production = null,
+    name = "Dev-AO Instance",
     autoCenter_production = true
 }) {
     var d = document.querySelector(el);
     var child = d.children.item(0);
 
     //deduce from env
-    if(production == null) {
+    if (production == null) {
         production = !!runtimeEnv('production')
     }
 
@@ -18,9 +38,13 @@ export function domMakeShowBox({
         d.style.transformOrigin = "0% 0%";
         d.style.position = "absolute";
         if (autoCenter_production) {
-            d.style.top = "50%";
-            d.style.left = "50%";
-            d.style.transform = "translate(-50%, -50%)";
+            // d.style.top = "50%";
+            // d.style.left = "50%";
+            // d.style.transform = "translate(-50%, -50%)";
+            d.style.top = "0";
+            d.style.left = "0";
+            d.style.bottom = "0";
+            d.style.right = "0";
         }
         // child.style.position = `absolute`;
         // child.style.transformOrigin = `0 0`;
@@ -28,8 +52,12 @@ export function domMakeShowBox({
         return;
     }
 
-    d.classList.add("dev")
+    var tiny = document.createElement("div");
+    tiny.className = "ao-showbox-tag";
+    tiny.innerHTML = "<div>" + name + " ~ " +  (new Date()).toUTCString() + "</div>"
+    d.appendChild(tiny);
 
+    d.classList.add("dev")
     d.style.transform = "translate(-50%, -50%)";
     d.style.transformOrigin = "50% 50%";
     d.style.position = "absolute";

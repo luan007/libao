@@ -2,11 +2,17 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 //according to https://stackoverflow.com/questions/53558916/babel-7-referenceerror-regeneratorruntime-is-not-defined
-
 export * from "./core/index"
 export * from "./ux/index"
 export * from "./fx/index"
 import * as _buildr from "./prototyping/buildr/index";
+
+import _sort from 'fast-sort';
+
+export var sort = _sort;
+
+import * as _yaml from "js-yaml";
+export var yaml = _yaml;
 
 //export base libs for const instances
 import * as _vue from "vue3";

@@ -5,10 +5,27 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 export * from "three/examples/jsm/modifiers/SubdivisionModifier"
 
+
 var _vec = new three.Vector3();
 var calc_vec = new three.Vector3();
 
 export var threeDefaultCtx = {};
+
+export function threeCameraFrustrum(ctx = threeDefaultCtx) {
+    var frustrum = new three.Frustum();
+    ctx.frustrum = frustrum;
+}
+
+export function threeUpdateFrustrum(ctx = threeDefaultCtx) {
+    ctx.camera.updateMatrix(); // make sure camera's local matrix is updated
+    ctx.camera.updateMatrixWorld(); // make sure camera's world matrix is updated
+    ctx.camera.matrixWorldInverse.getInverse(ctx.camera.matrixWorld);
+    ctx.frustum.setFromMatrix(new three.Matrix4().multiply(ctx.camera.projectionMatrix, ctx.camera.matrixWorldInverse));
+}
+
+export function threeFrustrumVisible(vec, ctx = threeDefaultCtx) {
+    return ctx.frustrum.containsPoint(vec);
+}
 
 export function threeUseRenderSeq(ctx) {
     ctx.renderSeq = ctx.renderSeq || [];
@@ -44,6 +61,25 @@ export function threePerspectiveCamera(fov = 50, ctx = threeDefaultCtx) {
         renderer.width / renderer.height,
         0.0001,
         2000
+    );
+    renderer.onResize((width, height) => {
+        cam.aspect = width / height;
+        cam.updateProjectionMatrix();
+    });
+    cam.aspect = renderer.width / renderer.height;
+    cam.updateProjectionMatrix();
+    ctx.camera = cam;
+    return cam;
+};
+
+
+export function threePerspectiveCameraNorm(fov = 50, ctx = threeDefaultCtx) {
+    var renderer = ctx.renderer;
+    var cam = new three.PerspectiveCamera(
+        fov,
+        renderer.width / renderer.height,
+        0.1,
+        1000
     );
     renderer.onResize((width, height) => {
         cam.aspect = width / height;
@@ -151,6 +187,13 @@ export function threeVec2Screen(v, ctx = threeDefaultCtx) {
     return threeScreenPosition(v, ctx.camera, ctx.renderer);
 }
 
+export function threeVec2ScreenCentered(v, ctx = threeDefaultCtx) {
+    var vec = threeScreenPosition(v, ctx.camera);
+    vec.x = vec.x * ctx.renderer.width * 0.5;
+    vec.y = vec.y * ctx.renderer.height * 0.5;
+    return vec;
+}
+
 export function threeVec2ScreenScale(v, w, h, ctx = threeDefaultCtx) {
     var vec = threeScreenPosition(v, ctx.camera);
     vec.x = vec.x * w * 0.5 + w * 0.5;
@@ -217,12 +260,13 @@ export function threeRenderer({
     autoSize = true,
     transparency = true,
     localClippingEnabled = false,
-    clearColor = 0,
+    clearColor = 0xff3333,
     canvas = null,
     autoClearColor = true,
     preserveDrawingBuffer = true,
     alpha = 1,
-    dpi = window.devicePixelRatio
+    dpi = window.devicePixelRatio,
+    appendTo = null
 }, ctx = threeDefaultCtx) {
     var e = new ev.EventEmitter();
     var renderer = new three.WebGLRenderer({
@@ -266,6 +310,9 @@ export function threeRenderer({
     ctx.renderer = renderer;
     canvas = renderer.domElement;
     ctx.canvas = canvas;
+    if (appendTo) {
+        appendTo.appendChild(renderer.domElement);
+    }
     return {
         renderer,
         canvas: renderer.domElement
@@ -281,9 +328,11 @@ export function threeTick(ctx = threeDefaultCtx) {
     if (ctx.renderSeq) {
         ctx.renderSeq.forEach((v) => rendered |= !!(v()));
     }
-
     if (!rendered && ctx.camera && ctx.scene && ctx.renderer) {
         ctx.renderer.render(ctx.scene, ctx.camera);
+    }
+    if (ctx.frustrum) {
+        threeUpdateFrustrum(ctx);
     }
 }
 

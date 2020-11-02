@@ -1,10 +1,12 @@
-
+export function setConfigHashSplitter(splitter) {
+    global["splitter"] = splitter
+}
 export function configFromHash() {
     var h = location.hash;
     if (!h) return {};
     h = decodeURIComponent(h);
     h = h.replace("#", "");
-    h = h.split("&");
+    h = h.split(global['splitter'] || "&");
     var obj = {};
     for (var kv = 0; kv < h.length; kv++) {
         var flag = h[kv].split("=");
@@ -24,6 +26,13 @@ export function runtimeEnv(key) {
 
 
 var cache = {};
+
+/**
+ * smartCache<T>(key: string, factory_fn: () => T): T;
+ * @param {string} key 
+ * @param {()=>T} factory_fn 
+ * @returns {T}
+ */
 export function smartCache(key, factory_fn) {
     cache[key] = cache[key] || [];
     if (cache[key].length > 0) {

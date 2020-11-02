@@ -327,7 +327,7 @@ export var threeFXSSAOEffect = ({
     bias = 0.05,
     intensity = 10,
     fade = 0.001,
-    resolutionScale = 1,
+    resolutionScale = 0.5,
     color = new three.Color(1, 0, 0)
 }, ctx = threeDefaultCtx) => {
     if (!ctx.composer_normal_pass) {

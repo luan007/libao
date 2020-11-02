@@ -1,5 +1,8 @@
 import * as three from "three";
 
+import * as geo from "three/examples/jsm/math/MeshSurfaceSampler"
+
+export var MeshSurfaceSampler = geo.MeshSurfaceSampler;
 
 export var RoundedBoxGeometry = function (
     width,

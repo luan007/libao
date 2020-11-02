@@ -51,6 +51,22 @@ export function gwait(promise_factory) {
     return gasset(Math.random(), (d) => d, promise_factory);
 }
 
+export function gAutoMountDirFromECSTATIC(url_base, item_promise_factory) {
+    return gwait(async () => {
+        var all = await (await fetch(url_base)).text();
+        var el = document.createElement('html');
+        el.innerHTML = all;
+        var items = el.querySelectorAll("table a");
+        var kv = {};
+        for(var i = 1; i < items.length; i++) {
+            var h = items[i].href;
+            var name = decodeURIComponent(h.split("/").pop().split(".")[0]);
+            kv[name] = await item_promise_factory(h.split("/").pop());
+        }
+        return kv;
+    });
+}
+
 async function gassetResolveOne(cur) {
     try {
         var meta = await cur.meta_factory(cur.core);

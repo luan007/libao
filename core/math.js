@@ -36,10 +36,16 @@ export function normD(x) {
     return Math.pow(Math.E, -x * x * 2 * Math.PI);
 }
 
-export function rrand(from, to) {
+export function rrand(from, to, resolution = 0) {
     from = from || -0.5;
     to = to || 0.5;
-    return map(Math.random(), 0, 1, from, to);
+    var m = map(Math.random(), 0, 1, from, to);
+    if(resolution > 0) {
+        m /= resolution;
+        m = Math.floor(m);
+        m *= resolution;
+    }
+    return m;
 }
 
 //turns anything into sth between 0~1 - also wrapped

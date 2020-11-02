@@ -29,7 +29,13 @@ export var VEC4_BUF = [0, 0, 0, 0];
 const ABORT = -999;
 
 function runtime_run_pgm_on_index(runtime, i, p, pgm_seq, seq_name) {
+    if (runtime.mock) {
+        runtime.log_fn.push('SEQ=' + seq_name);
+    }
     for (var j = 0; j < pgm_seq.length; j++) {
+        if (runtime.mock) {
+            runtime.log_fn.push(pgm_seq[j]);
+        }
         if (pgm_seq[j](p, i, runtime, seq_name) == ABORT) {
             return ABORT; //something happened;
         }
@@ -108,6 +114,45 @@ export function form(capacity = 1000) {
         kill: function (p) {
             if (!runtime._built) throw 'Please call engine.build() before first action';
             return runtime.killAt(container.indexOf(p));
+        },
+        mock_run: function () {
+            runtime.t = 0;
+            runtime.dt = 1 / 60;
+            runtime.t *= runtime.time_mult;
+            runtime.dt *= runtime.time_mult;
+            runtime.mock = true;
+            runtime.log_fn = [];
+            runtime_run_pgm_on_index(runtime, 0, container[0], program.main, 'main');
+            runtime.mock = false;
+            return runtime.log_fn;
+        },
+        mock_run_pgm: function () {
+            // var res = runtime.mock_run();
+            var pgm = ''
+            function expand(fn) {
+                var f = fn.toString();
+                var res = "";
+                //runtime_run_pgm_on_index
+                var regex = /runtime_run_pgm_on_index\(.+,(.+)\).+$/gm;
+                var match;
+                while (match = regex.exec(f)) {
+                    var seq = (match[1].replace(/(\'|\")/g, '').trim());
+                    var subpgm = "\n\n////PGM - " + seq + "\n\n";
+                    program[seq].forEach((v) => {
+                        subpgm += expand(v)
+                    })
+                    subpgm += "\n\n////EPGM"
+                    f = f.replace(match[0], subpgm);
+                }
+                f = f.slice(f.indexOf("{") + 1, f.lastIndexOf("}"));
+                f = "/////SEG\n" + f;
+                res += f + "\n"
+                return res;
+            }
+            program.main.forEach(v => {
+                pgm += expand(v)
+            })
+            console.log(pgm);
         },
         tick: function (t, dt) {
             if (!runtime._built) throw 'Please call engine.build() before first action';
@@ -218,12 +263,12 @@ export function attach_rarvr(runtime) {
     return params;
 }
 
-export function attach_looper(runtime, time_mult = 1, loop = loop) {
+export function attach_looper(runtime, time_mult = 1, lp = loop) {
     runtime.time_mult = time_mult;
     function tick() {
         runtime.tick();
     }
-    loop && loop(tick);
+    lp && lp(tick);
     return tick;
 }
 
@@ -368,6 +413,24 @@ export function on_built(runtime, main_fn) {
 }
 export function on_tick(runtime, main_fn) {
     runtime.program["tick"].push(main_fn);
+}
+
+export function dump_program(runtime) {
+    console.log(runtime);
+}
+export function dump_single_p(runtime, use_table = true) {
+    var single_shot = false;
+    on_emit(runtime, (p) => {
+        if (single_shot) return;
+        single_shot = true;
+        console.log("Storm_sys Particle Dump #0");
+        var clone = {};
+        for (var i in p) {
+            clone[i] = JSON.stringify(p[i]);
+        }
+        use_table && console.table(clone);
+        (!use_table) && console.log(Object.keys(p).map(v => "::: " + v + " ~\t\t " + JSON.stringify(p[v])).join("\n"));
+    });
 }
 
 export var def = on_def;

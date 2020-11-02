@@ -1,7 +1,19 @@
+/**
+ * A number, or a string containing a number.
+ * @typedef {Object} glueMeta
+ * @property {string} name
+ * @property {string} desc
+ * @property {*} misc
+ * @property {*} controller
+ * @property {*} contrain
+ */
+
+
 import { vue } from "..";
 import { EventEmitter2 as EventEmitter } from "eventemitter2";
 //confused? take a look @readme
 //glue v0 - pretty rough now - not production ready 
+
 
 export var glueDef = {};
 export var glueRouter = {};
@@ -14,6 +26,11 @@ var EVENT_PLACEHOLDER = Symbol();
 export var GLUE_EVENT = Symbol('EV_GLUE');
 var GLUE_SYM = Symbol('SYM_GLUE');
 
+/**
+ * 
+ * @param {glueMeta} meta 
+ * @returns {((data?) => any) | { on: () => any }}
+ */
 export function glueEvent(meta) {
     return {
         mark: GLUE_SYM,
@@ -21,6 +38,14 @@ export function glueEvent(meta) {
         meta: meta
     };
 }
+
+/**
+ * 
+ * @param {T} c 
+ * @param {glueMeta} meta 
+ * @returns {T}
+ * @template T
+ */
 export function glueAction(c = () => { }, meta) {
     return {
         mark: GLUE_SYM,
@@ -29,6 +54,14 @@ export function glueAction(c = () => { }, meta) {
         action: c
     };
 }
+
+/**
+ * 
+ * @param {T} v 
+ * @param {glueMeta} meta 
+ * @returns {T}
+ * @template T
+ */
 export function glueValue(v, meta) {
     return {
         mark: GLUE_SYM,
@@ -165,6 +198,14 @@ export function glueInternalRegisterKV__V2(key, o, i) {
     return glueInternalRegisterKV__(key, o, i); //fall back
 }
 
+
+/**
+ * 
+ * @param {T} o 
+ * @param {*} prefix 
+ * @returns {T}
+ * @template T
+ */
 export function glueObject(o, prefix = "") {
     // glueStore[o] = o; //crazy right..?
     var j = vue.reactive(o);
@@ -277,6 +318,14 @@ var command = glueObject({ //command object - this should be BI-DIR-SYNCED to re
 
 //binding utils
 
+/**
+ * 
+ * @param {T} inobj 
+ * @param {*} key 
+ * @param {*} path 
+ * @returns {T}
+ * @template T
+ */
 export function glued(inobj, key, path) {
     glueValueChanged(path, (data) => {
         inobj[key] = data.new_val;

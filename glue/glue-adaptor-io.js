@@ -1,12 +1,14 @@
 import socketio from "socket.io-client"
-import { glueEv, glueApplyControl } from "./glue";
+import { glueEv, glueApplyControl, glueDef } from "./glue";
 
 //TODO check if path is valid
 export function init(path) {
     path = path.endsWith("/") ? path.substring(0, path.length - 1) : path;
     var io = socketio(path + "/glue");
     glueEv.on("*", (e) => {
-        io.emit("up", e)
+        io.emit("up", e); //
+        //so local ev bubbles up (always)
+        //
     });
     io.on('hello', () => {
         io.emit("def", glueDef);
