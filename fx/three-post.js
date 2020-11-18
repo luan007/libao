@@ -146,7 +146,7 @@ export var threeBCHCorrectionEffect = ({
 });
 
 export var threeFXSMAAEffect = ({
-    edgeDetection = 0.1,
+    edgeDetection = 0.01,
     searchImage,
     areaImage
 }, ctx = threeDefaultCtx) => {

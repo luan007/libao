@@ -9,3 +9,8 @@ export * from "./three-shader";
 export * from "./three-composite-materials";
 export * from "./vue2-util";
 export * from "./canvas2d";
+
+
+export * from "three/examples/jsm/objects/ReflectorRTT"
+export * from "three/examples/jsm/objects/Reflector"
+export * from "three/examples/jsm/objects/Water2"

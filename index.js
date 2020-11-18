@@ -34,5 +34,6 @@ export * from "./storm/index"
 export * from "./dom/index"
 export * from "./glue/glue"
 export * from "./glue/adaptors"
+export * from "./glue/mirrors"
 export * from "./glue/gasset"
 import "./dom/*.less";

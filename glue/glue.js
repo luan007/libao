@@ -94,7 +94,7 @@ function _glue_register_value(key, o, i, meta = {}) {
 
     vue.watch(() => o[i], (new_val, old_val) => {
         //changed
-        emit(new_val, old_val)
+        (new_val != old_val) && emit(new_val, old_val)
     });
 
     glueDef[key] = {

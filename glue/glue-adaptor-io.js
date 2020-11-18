@@ -23,7 +23,7 @@ export function init(path) {
         try {
             glueApplyControl(e);
         } catch (e) {
-            console.warn(e); //stupid for now, TODO: fix this
+            // console.warn(e); //stupid for now, TODO: fix this
         }
     });
 }
