@@ -16,9 +16,13 @@ import * as postprocessing from "postprocessing";
 import { HalfFloatType } from "three";
 import * as three from "three";
 
+
+import { HorizontalTiltShiftShader } from "three/examples/jsm/shaders/HorizontalTiltShiftShader"
+import { VerticalTiltShiftShader } from "three/examples/jsm/shaders/VerticalTiltShiftShader"
+
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass'
 import { PatchedUnrealBloomPass } from "./patch/UnreallBloomPassPatched";
-import { deltaTMultipler } from '../core';
+import { deltaTMultipler, loop } from '../core';
 
 export function threeFXPatchEffect(proto) {
     if (proto.patched) return; //skip, already done!
@@ -186,6 +190,37 @@ export var threeFXNormalPass = ({
     ctx.composer_normal_pass = pass;
     return { pass: pass, params: params, update: () => { } };
 }
+
+export var threeFXTiltShiftPass = ({
+    r = 0.5,
+    hv_amount = 1,
+    auto_loop = true
+}, ctx = threeDefaultCtx) => {
+    var params = {
+        r, hv_amount
+    }
+    var horShader = new three.ShaderMaterial(
+        HorizontalTiltShiftShader
+    );
+    var verShader = new three.ShaderMaterial(
+        VerticalTiltShiftShader
+    );
+    const hor = new postprocessing.ShaderPass(horShader, "tDiffuse");
+    const ver = new postprocessing.ShaderPass(verShader, "tDiffuse");
+    function update() {
+        horShader.uniforms.h.value = 1 / window.innerWidth * params.hv_amount;
+        verShader.uniforms.v.value = 1 / window.innerHeight * params.hv_amount;
+        horShader.uniforms.r.value = params.r;
+        verShader.uniforms.r.value = params.r;
+    };
+    update();
+    if (auto_loop) {
+        loop(update);
+    }
+    ctx.composer.addPass(hor);
+    ctx.composer.addPass(ver);
+    return { h: hor, v: ver, params: params, update: update };
+};
 
 export var threeFXSSAOEffect_PRESETS = {
     DBG: {
