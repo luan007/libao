@@ -17,8 +17,8 @@ import { HalfFloatType } from "three";
 import * as three from "three";
 
 
-import { HorizontalTiltShiftShader } from "three/examples/jsm/shaders/HorizontalTiltShiftShader"
-import { VerticalTiltShiftShader } from "three/examples/jsm/shaders/VerticalTiltShiftShader"
+import { HorizontalTiltShiftShader } from "./patch/HorizontalTiltShiftShader"
+import { VerticalTiltShiftShader } from "./patch/VerticleTiltShiftShader"
 
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass'
 import { PatchedUnrealBloomPass } from "./patch/UnreallBloomPassPatched";
@@ -45,6 +45,7 @@ export var threeFXComposer = ({ skipRenderPass = false }, ctx = threeDefaultCtx)
     var clock = new three.Clock();
     const composer = new EffectComposer(ctx.renderer, {
         frameBufferType: HalfFloatType,
+        depthBuffer: true
     });
     ctx.composer = composer;
     ctx.clock = clock;
@@ -193,11 +194,12 @@ export var threeFXNormalPass = ({
 
 export var threeFXTiltShiftPass = ({
     r = 0.5,
+    focus_area = 1,
     hv_amount = 1,
     auto_loop = true
 }, ctx = threeDefaultCtx) => {
     var params = {
-        r, hv_amount
+        r, hv_amount, focus_area
     }
     var horShader = new three.ShaderMaterial(
         HorizontalTiltShiftShader
@@ -212,6 +214,8 @@ export var threeFXTiltShiftPass = ({
         verShader.uniforms.v.value = 1 / window.innerHeight * params.hv_amount;
         horShader.uniforms.r.value = params.r;
         verShader.uniforms.r.value = params.r;
+        verShader.uniforms.f.value = params.focus_area;
+        verShader.uniforms.f.value = params.focus_area;
     };
     update();
     if (auto_loop) {
@@ -373,6 +377,8 @@ export var threeFXSSAOEffect = ({
         distanceFalloff, rangeThreshold, rangeFalloff,
         luminanceInfluence, radius, scale, bias, intensity,
         resolutionScale,
+        depthAwareUpsampling: true,
+        distanceScaling: false,
         fade, color
     };
     const ssaoEffect = new SSAOEffect(ctx.camera, ctx.composer_normal_pass.renderTarget.texture,

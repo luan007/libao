@@ -134,6 +134,10 @@ export function eased(v, t, e, prec) {
     return new EasedValue(v, t, e, prec);
 }
 
+export function ease_remember(dictionary) {
+    return JSON.parse(JSON.stringify(dictionary));
+}
+
 export class EasedValue {
     constructor(value, to, e, precision) {
         this.value = value;
@@ -215,6 +219,18 @@ export function loop(func_or_obj) {
         return;
     }
     all.push(func);
+}
+
+export function loopSloppy(func, func_idle = false, skip = 1, total = 2) {
+    var s = 0;
+    loop((t, dt) => {
+        s++;
+        s = s % (total)
+        if (s < skip) {
+            return (!!func_idle) && func_idle(t, dt);
+        }
+        func(t, dt);
+    });
 }
 
 export function noLoop(func_or_obj) {

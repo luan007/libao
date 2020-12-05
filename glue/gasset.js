@@ -77,6 +77,7 @@ async function gassetResolveOne(cur) {
         cur.core.data = transformed;
         return cur;
     } catch (e) {
+        console.warn("Asset resolve failed", e);
         return -1;
     }
 }

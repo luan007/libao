@@ -99,7 +99,7 @@ export function fetchJSON(v, cb) {
         return r.json()
     }).then((t) => {
         // console.log("Parsed", v)
-        if(typeof(cb) == 'object') {
+        if (typeof (cb) == 'object') {
             cb[key] = t;
         } else {
             cb(key, t, v);
@@ -113,10 +113,15 @@ export function fetchText(v, cb) {
         return r.text()
     }).then((t) => {
         // console.log("Parsed", v)
-        if(typeof(cb) == 'object') {
+        if (typeof (cb) == 'object') {
             cb[key] = t;
         } else {
             cb(key, t, v);
         }
     })
+}
+
+export async function fetchTextAsync(v) {
+    var q = await fetch(v);
+    return await q.text();
 }

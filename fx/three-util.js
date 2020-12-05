@@ -54,13 +54,13 @@ export function threeLocalToWorldNoModify(obj3d, vec) {
 }
 
 
-export function threePerspectiveCamera(fov = 50, ctx = threeDefaultCtx) {
+export function threePerspectiveCamera(fov = 50, ctx = threeDefaultCtx, near = 0.1, far = 2000) {
     var renderer = ctx.renderer;
     var cam = new three.PerspectiveCamera(
         fov,
         renderer.width / renderer.height,
-        0.1,
-        2000
+        near,
+        far
     );
     renderer.onResize((width, height) => {
         cam.aspect = width / height;

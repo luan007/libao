@@ -40,7 +40,7 @@ export function rrand(from, to, resolution = 0) {
     from = from || -0.5;
     to = to || 0.5;
     var m = map(Math.random(), 0, 1, from, to);
-    if(resolution > 0) {
+    if (resolution > 0) {
         m /= resolution;
         m = Math.floor(m);
         m *= resolution;
@@ -66,6 +66,17 @@ export function clampWrap(q, a, b) {
     var relative = q % range;
     return (relative < 0 ? (range + relative) : relative) + a;
 }
+
+//a & b 0<=>2xrange (Math.PI * 2)
+export function wrapCircular(a, b, range) {
+    if (b - a > range) {
+        a += range * 2;
+    } else if (b - a < - range) {
+        a -= range * 2;
+    }
+    return a;
+}
+
 
 //flip flop, determines something is within range
 export function within(q, a, b) {

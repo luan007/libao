@@ -200,6 +200,19 @@ export function mouseInputVueReactive(domElement = document.body, mount = vue.re
     return mouseInput(domElement, mount);
 }
 
+export function keyboardTrackingState(domElement = document.body) {
+    var state = {};
+    domElement.addEventListener("keydown", (e) => {
+        state[e.key.toLowerCase()] = 1;
+    });
+    domElement.addEventListener("keyup", (e) => {
+        state[e.key.toLowerCase()] = 0;
+    });
+    return state;
+}
+
+export var keyboard = keyboardTrackingState();
+
 export function keyboardInputActions(domElement = document.body, actions = {}) {
     domElement.addEventListener("keydown", (e) => {
         actions[
