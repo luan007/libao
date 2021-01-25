@@ -104,10 +104,10 @@ export var threeCMAT_SelectiveFog = () => {
     };
 };
 
-export var threeCMAT_Rimlight = (factor = 0.3, strength = 1.0, power = 1.0, action = "+", target = "outgoingLight") => {
+export var threeCMAT_Rimlight = (factor = 0.3, strength = 1.0, power = 1.0, action = "+", target = "outgoingLight", tint = "vec3(1.0, 1.0, 1.0)") => {
     return (shader) => {
         shader.fragmentShader = patch(shader.fragmentShader)
-            .PATCH_ADD_RIMLIGHT(factor, strength, power, action, target)
+            .PATCH_ADD_RIMLIGHT(factor, strength, power, action, target, tint)
             .done()
     };
 };

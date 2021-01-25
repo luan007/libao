@@ -154,7 +154,7 @@ class _patcher {
             .beforeColor(
                 `
                         float noise = ${strength.toFixed(2)} * (0.5 - rng_rand(vec3(${scalerX.toFixed(2)}, ${scalerY.toFixed(2)}, ${scalerZ.toFixed(2)}), length(gl_FragCoord)));
-                        outgoingLight *= (1.0 + noise);
+                        outgoingLight *= (1.0 - noise);
                         `
             )
     }
@@ -170,12 +170,12 @@ class _patcher {
             )
     }
 
-    PATCH_ADD_RIMLIGHT(factor = 0.3, strength = 1.0, power = 1.0, action = "+", target = "outgoingLight") {
+    PATCH_ADD_RIMLIGHT(factor = 0.3, strength = 1.0, power = 1.0, action = "+", target = "outgoingLight", tint = "vec3(1.0, 1.0, 1.0)") {
         return this
             .shaderFunc(threeShaderFuncs.rim)
             .beforeColor(
                 `
-                    ${target} ${action}= ${factor.toFixed(2)} * rim(${strength.toFixed(2)}, ${power.toFixed(2)});
+                    ${target} ${action}= ${tint} * ${factor.toFixed(2)} * rim(${strength.toFixed(2)}, ${power.toFixed(2)});
                 `
             )
     }

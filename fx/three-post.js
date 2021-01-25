@@ -17,6 +17,7 @@ import { HalfFloatType } from "three";
 import * as three from "three";
 
 
+
 import { HorizontalTiltShiftShader } from "./patch/HorizontalTiltShiftShader"
 import { VerticalTiltShiftShader } from "./patch/VerticleTiltShiftShader"
 
@@ -76,7 +77,6 @@ export var threeFXRenderPass = ({
     var params = { material, clear };
     return { pass: pass, params: params, update: () => { } };
 };
-
 
 export var threeFXPreservedRenderPass = ({ material = null }, ctx = threeDefaultCtx) => threeFXRenderPass({ material, clear: false }, ctx)
 

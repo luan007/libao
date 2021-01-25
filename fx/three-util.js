@@ -266,6 +266,8 @@ export function threeRenderer({
     preserveDrawingBuffer = true,
     alpha = 1,
     dpi = window.devicePixelRatio,
+    stencil = false,
+    depth = true,
     appendTo = null
 }, ctx = threeDefaultCtx) {
     var e = new ev.EventEmitter();
@@ -346,12 +348,14 @@ export function threeLoop(ctx = threeDefaultCtx) {
 export function threeLoadTexture(path, key = 'Texture_' + Math.random(), ctx = threeDefaultCtx) {
     ctx.resources = ctx.resources || {};
     ctx.resources[key] = (new three.TextureLoader()).load(path)
+    ctx.resources[key].anisotropy = 16;
     return ctx.resources[key];
 }
 
 export async function threeLoadTextureAsync(path, key = 'GLTF_' + Math.random(), ctx = threeDefaultCtx) {
     ctx.resources = ctx.resources || {};
     ctx.resources[key] = await (new three.TextureLoader()).loadAsync(path)
+    ctx.resources[key].anisotropy = 16;
     return ctx.resources[key];
 }
 
