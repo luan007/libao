@@ -94,7 +94,8 @@ export function threePerspectiveCameraNorm(fov = 50, ctx = threeDefaultCtx) {
 export function threeOrthoCamera(scale, ctx = threeDefaultCtx) {
     scale = scale || 250;
     var renderer = ctx.renderer;
-    var cam = new three.OrthographicCamera(renderer.width / -scale, renderer.width / scale, renderer.height / scale, renderer.height / -scale, 0.0001, 10000);
+    var cam = new three.OrthographicCamera(renderer.width / -scale, renderer.width / scale, renderer.height / scale, renderer.height / -scale
+        , 0.01, 33);
     renderer.onResize((width, height) => {
         cam.left = -width / -scale;
         cam.right = width / -scale;
@@ -253,7 +254,7 @@ export var threeRendererCfg_HighPerf_PostFX = {
 };
 
 export function threeRenderer({
-    logarithmicDepthBuffer = true,
+    logarithmicDepthBuffer = false,
     antialias = true,
     width = 0,
     height = 0,
@@ -263,7 +264,7 @@ export function threeRenderer({
     clearColor = 0xff3333,
     canvas = null,
     autoClearColor = true,
-    preserveDrawingBuffer = true,
+    preserveDrawingBuffer = false,
     alpha = 1,
     dpi = window.devicePixelRatio,
     stencil = false,

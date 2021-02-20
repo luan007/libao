@@ -54,7 +54,7 @@ export function domMakeShowBox({
 
     var tiny = document.createElement("div");
     tiny.className = "ao-showbox-tag";
-    tiny.innerHTML = "<div>" + name + " ~ " +  (new Date()).toUTCString() + "</div>"
+    tiny.innerHTML = "<div>" + name + " ~ " + (new Date()).toUTCString() + "</div>"
     d.appendChild(tiny);
 
     d.classList.add("dev")
@@ -105,4 +105,8 @@ export function domMakeShowBox({
 
     window.addEventListener('resize', () => { defer(update, def); });
     var obs = new ResizeObserver(() => { defer(update, def); }).observe(child);
+
+    setTimeout(() => {
+        update();
+    }, 500)
 }
