@@ -356,6 +356,7 @@ export function threeLoadTexture(path, key = 'Texture_' + Math.random(), ctx = t
 export async function threeLoadTextureAsync(path, key = 'GLTF_' + Math.random(), ctx = threeDefaultCtx) {
     ctx.resources = ctx.resources || {};
     ctx.resources[key] = await (new three.TextureLoader()).loadAsync(path)
+    ctx.resources[key].encoding = three.sRGBEncoding;
     ctx.resources[key].anisotropy = 16;
     return ctx.resources[key];
 }

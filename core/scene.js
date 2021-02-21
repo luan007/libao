@@ -31,6 +31,13 @@ export class Scene {
     }
 }
 
+/**
+ * 
+ * @param {(t, dt, scene: Scene) => any} update 
+ * @param {*} grpId 
+ * @param {*} id 
+ * @param {*} init 
+ */
 export function sceneBuild(update, grpId, id, init) {
     var s = new Scene(update, grpId, id, undefined, init);
     return s;
