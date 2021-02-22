@@ -151,6 +151,17 @@ export function threeHalfClearPlane({ motion_threshold = 0.1, opacity = 0.5, mot
     return fadeMesh;
 }
 
+export function threeVec2ScreenRel(p, ctx = threeDefaultCtx) {
+    calc_vec.set(p.x, p.y, p.z);
+    var vec = calc_vec.project(ctx.camera);
+    vec.y = vec.y * -1;
+    vec.z = p.z;
+
+    vec.y = vec.y * 0.5 + 0.5;
+    vec.x = vec.x * 0.5 + 0.5;
+    return vec;
+}
+
 export function threeScreenPosition(p, q, n, camera, renderer) {
     var v = null;
     if (p && p.x != null) {
@@ -184,6 +195,7 @@ export function threeScreenPosition(p, q, n, camera, renderer) {
     return vec;
 }
 
+//full of shit
 export function threeVec2Screen(v, ctx = threeDefaultCtx) {
     return threeScreenPosition(v, ctx.camera, ctx.renderer);
 }
