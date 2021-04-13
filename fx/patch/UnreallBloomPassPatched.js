@@ -215,7 +215,7 @@ PatchedUnrealBloomPass.prototype = Object.assign(Object.create(Pass.prototype), 
 
 	render: function (renderer, writeBuffer, readBuffer, deltaTime, maskActive) {
 
-		this.oldClearColor.copy(renderer.getClearColor());
+		this.oldClearColor.copy(renderer.getClearColor(this.oldClearColor));
 		this.oldClearAlpha = renderer.getClearAlpha();
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;

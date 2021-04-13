@@ -1,4 +1,5 @@
 import qps from "qps";
+import { yaml } from "..";
 
 export var QPS = qps;
 var _promise_queues = {};
@@ -90,6 +91,12 @@ export function Promise_Queue(return_promise, _queue_name) {
 export async function fetchJSONAsync(v) {
     var q = await fetch(v);
     return await q.json();
+}
+
+
+export async function fetchYamlAsync(v) {
+    var q = await fetch(v);
+    return yaml.load(await q.text());
 }
 
 export function fetchJSON(v, cb) {

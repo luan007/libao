@@ -179,15 +179,15 @@ class _patcher {
                 `
             )
     }
-    
+
     PATCH_BRIGHTNESS_AS_TRANSPARENCY() {
         return this
-            .after(threeShaderSignatures.gl_FragColor, 
+            .after(threeShaderSignatures.gl_FragColor,
                 `
                 float _b = (gl_FragColor.x + gl_FragColor.y + gl_FragColor.z) / 3.0;
                 gl_FragColor = vec4(gl_FragColor.xyz, gl_FragColor.a * _b);
                 `
-                )
+            )
     }
 
     PATCH_CLAMP_COLOR() {
@@ -278,3 +278,24 @@ export var threeCombineMatcapMaterial_DiffusePatch = {
     OP: "*",
     FACTOR: 1.0
 };
+
+
+export function threeExpandShaderIncludes(s) {
+    const includePattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
+    function resolveIncludes(string) {
+
+        return string.replace(includePattern, includeReplacer);
+
+    }
+    function includeReplacer(match, include) {
+        const string = three.ShaderChunk[include];
+
+        if (string === undefined) {
+
+            throw new Error('Can not resolve #include <' + include + '>');
+
+        }
+        return resolveIncludes(string);
+    }
+    return resolveIncludes(s);
+}

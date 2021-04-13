@@ -21,7 +21,12 @@ import * as three from "three";
 import { HorizontalTiltShiftShader } from "./patch/HorizontalTiltShiftShader"
 import { VerticalTiltShiftShader } from "./patch/VerticleTiltShiftShader"
 
+import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader";
+
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass'
+import { SSAARenderPass } from 'three/examples/jsm/postprocessing/SSAARenderPass'
+import { SSAOPass } from 'three/examples/jsm/postprocessing/SSAOPass'
+import { TAARenderPass } from 'three/examples/jsm/postprocessing/TAARenderPass'
 import { PatchedUnrealBloomPass } from "./patch/UnreallBloomPassPatched";
 import { deltaTMultipler, loop } from '../core';
 
@@ -117,6 +122,30 @@ export var threeFXFilmPass = ({
     return { pass: pass, params: params, update: () => { } };
 };
 
+export var threeFXSSAAPass = ({
+    sampleLevel = 3 //8x
+}, ctx = threeDefaultCtx) => {
+    var params = { sampleLevel }
+    threeFXPatchEffect(SSAARenderPass);
+    var pass = new SSAARenderPass(ctx.scene, ctx.camera);
+    pass.sampleLevel = sampleLevel;
+    pass.renderToScreen = false;
+    ctx.composer.addPass(pass);
+    return { pass: pass, params: params, update: () => { } };
+};
+
+export var threeFXTAAPass = ({
+    sampleLevel = 3 //8x
+}, ctx = threeDefaultCtx) => {
+    var params = { sampleLevel }
+    threeFXPatchEffect(TAARenderPass);
+    var pass = new TAARenderPass(ctx.scene, ctx.camera);
+    pass.sampleLevel = sampleLevel;
+    pass.renderToScreen = false;
+    ctx.composer.addPass(pass);
+    return { pass: pass, params: params, update: () => { } };
+};
+
 export var threeFXEffect = (effect, params) => {
     //why? because we can!
     return { effect: new effect(params), params: params, update: () => { }, is_effect_shell: true };
@@ -166,6 +195,35 @@ export var threeFXSMAAEffect = ({
     const smaaEffect = new SMAAEffect(searchImage, areaImage)
     smaaEffect.colorEdgesMaterial.setEdgeDetectionThreshold(edgeDetection)
     smaaEffect.applyPreset(postprocessing.SMAAPreset.ULTRA)
+    smaaEffect.edgeDetectionMaterial.setEdgeDetectionMode(postprocessing.EdgeDetectionMode.DEPTH)
+    return { effect: smaaEffect, params: params, update: () => { }, is_effect_shell: true };
+};
+
+export var threeFXSMAALUMAEffect = ({
+    edgeDetection = 0.01,
+    searchImage,
+    areaImage
+}, ctx = threeDefaultCtx) => {
+    if (!searchImage && !ctx.fx_smaa_textures) {
+        throw "SMAA Effect requires ctx.fx_smaa_textures, load them first or manually set searchImage"
+    }
+    searchImage = searchImage || ctx.fx_smaa_textures[0];
+    areaImage = areaImage || ctx.fx_smaa_textures[1];
+    var params = {
+        searchImage, areaImage, edgeDetection
+    };
+    const smaaEffect = new SMAAEffect(searchImage, areaImage)
+    smaaEffect.colorEdgesMaterial.setEdgeDetectionThreshold(edgeDetection)
+    smaaEffect.applyPreset(postprocessing.SMAAPreset.ULTRA)
+    smaaEffect.edgeDetectionMaterial.setEdgeDetectionMode(postprocessing.EdgeDetectionMode.LUMA)
+    return { effect: smaaEffect, params: params, update: () => { }, is_effect_shell: true };
+};
+
+
+export var threeFX_ORG_SSAOEffect = ({ }, ctx = threeDefaultCtx) => {
+    const smaaEffect = new SSAOPass(searchImage, areaImage)
+    smaaEffect.colorEdgesMaterial.setEdgeDetectionThreshold(edgeDetection)
+    smaaEffect.applyPreset(postprocessing.SMAAPreset.ULTRA)
     return { effect: smaaEffect, params: params, update: () => { }, is_effect_shell: true };
 };
 
@@ -191,6 +249,35 @@ export var threeFXNormalPass = ({
     ctx.composer_normal_pass = pass;
     return { pass: pass, params: params, update: () => { } };
 }
+
+export var threeFXFXAAPass = ({w, h}, ctx = threeDefaultCtx) => {
+    var params = {
+        w, h
+    }
+    var fxaa = new three.ShaderMaterial(
+        FXAAShader
+    );
+    
+    // function update() {
+    //     fx.uniforms.h.value = 1 / window.innerWidth * params.hv_amount;
+    //     verShader.uniforms.v.value = 1 / window.innerHeight * params.hv_amount;
+    // };
+    // update();
+    // console.log(fxaa, fxaaShaderPass)
+    fxaa.uniforms.resolution.value.x = 1 / w;
+    fxaa.uniforms.resolution.value.y = 1 / h;
+    const fxaaShaderPass = new postprocessing.ShaderPass(fxaa, "tDiffuse");
+
+    function update() {}
+    // if (auto_loop) {
+    //     loop(update);
+    // }
+    // ctx.composer.addPass(hor);
+    ctx.composer.addPass(fxaaShaderPass);
+    return { fxaa: fxaa, params: params, update: update };
+};
+
+
 
 export var threeFXTiltShiftPass = ({
     r = 0.5,

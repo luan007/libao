@@ -21,6 +21,15 @@ export function loadImageAsync(url) {
     })
 }
 
+export function cssInjectVariables(vars, units = null, prepend = "", elem = document.body) {
+    units = (units || vars.units) || {};
+    for(var i in vars) {
+        if(i == 'units') continue;
+        elem.style.setProperty("--" + prepend + i, vars[i] + (units[i] || ""));
+    }
+}
+
+
 export function loadImageAsCanvasAsync(url) {
     return new Promise((res, rej) => {
         var i = new Image();

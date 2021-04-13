@@ -3,7 +3,11 @@ import * as ev from "eventemitter3";
 import { loop, ease } from "../core";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
-export * from "three/examples/jsm/modifiers/SubdivisionModifier"
+// export * from "three/examples/jsm/modifiers/SubdivisionModifier"
+import { Geometry } from "three/examples/jsm/deprecated/Geometry"
+
+
+three.Geometry = Geometry; //this is the fix
 
 
 var _vec = new three.Vector3();
@@ -271,7 +275,7 @@ export function threeRenderer({
     width = 0,
     height = 0,
     autoSize = true,
-    transparency = true,
+    transparency = false,
     localClippingEnabled = false,
     clearColor = 0xff3333,
     canvas = null,
@@ -365,6 +369,13 @@ export function threeLoadTexture(path, key = 'Texture_' + Math.random(), ctx = t
     return ctx.resources[key];
 }
 
+/**
+ * 
+ * @param {*} path 
+ * @param {*} key 
+ * @param {*} ctx 
+ * @returns {three.Texture}
+ */
 export async function threeLoadTextureAsync(path, key = 'GLTF_' + Math.random(), ctx = threeDefaultCtx) {
     ctx.resources = ctx.resources || {};
     ctx.resources[key] = await (new three.TextureLoader()).loadAsync(path)
