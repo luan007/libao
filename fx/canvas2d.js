@@ -55,7 +55,7 @@ export function fbo2d(w, h, dpi = 1) {
         ctx2d.restore();
     }
     function withImageData() {
-        obj.imageData = getImageData(0, 0, cv.width, cv.height).data;
+        obj.imageData = cv.getImageData(0, 0, cv.width, cv.height).data;
         return obj.imageData;
     }
     function sample(x, y, i) {
