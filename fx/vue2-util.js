@@ -4,6 +4,7 @@ import * as utilComps from "./vue2comps/*.vue";
 export function vue2ImportAll(components, prefix = "") {
     for (var i in components) {
         if (i == 'default') continue;
+        console.log(i);
         Vue.component(prefix + i, components[i].default)
     }
 }

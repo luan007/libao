@@ -99,7 +99,7 @@ export function threeOrthoCamera(scale, ctx = threeDefaultCtx) {
     scale = scale || 250;
     var renderer = ctx.renderer;
     var cam = new three.OrthographicCamera(renderer.width / -scale, renderer.width / scale, renderer.height / scale, renderer.height / -scale
-        , 0.01, 33);
+        , 0.01, 503);
     renderer.onResize((width, height) => {
         cam.left = -width / -scale;
         cam.right = width / -scale;
