@@ -474,3 +474,132 @@ export function threeMATtoCSSMAT(matrix) {
 
     return 'translate(-50%,-50%)' + matrix3d;
 }
+
+
+
+
+/**
+ * @typedef {{mat: THREE.Object3D, color: THREE.Color}} three_instance
+ */
+
+/**
+ * @typedef {{pos: THREE.Vector3, color: THREE.Color}} three_pts_instance
+ */
+
+export function threeInstancedMesh(geo, mat, count) {
+    //get bunch of stuff, quick
+    var instancedGeo = new three.InstancedMesh(geo, mat, count);
+
+    /**
+     * @type {three_instance[]}
+     */
+    var objects = [];
+    for (var i = 0; i < count; i++) {
+        objects.push({
+            mat: new three.Object3D(),
+            color: new three.Color()
+        });
+    }
+
+    function apply() {
+        for (var i = 0; i < count; i++) {
+            objects[i].mat.updateMatrix();
+            instancedGeo.setMatrixAt(
+                i, objects[i].mat.matrix
+            )
+            instancedGeo.setColorAt(
+                i, objects[i].color
+            )
+        }
+        instancedGeo.instanceMatrix.needsUpdate = true;
+        instancedGeo.instanceColor.needsUpdate = true;
+    }
+
+    /**
+     * 
+     * @param {(i: number, o: three_instance)=>any} fn 
+     */
+    function applyEach(fn) {
+        for (var i = 0; i < count; i++) {
+            fn(i, objects[i]);
+            objects[i].mat.updateMatrix();
+            instancedGeo.setMatrixAt(
+                i, objects[i].mat.matrix
+            )
+            instancedGeo.setColorAt(
+                i, objects[i].color
+            )
+        }
+        instancedGeo.instanceMatrix.needsUpdate = true;
+        instancedGeo.instanceColor.needsUpdate = true;
+    }
+
+    return {
+        mesh: instancedGeo,
+        update: apply,
+        for: applyEach,
+        objects: objects
+    };
+}
+
+export function threePointCloud(mat, count) {
+    //get bunch of stuff, quick
+
+    /**
+     * @type {three_pts_instance[]}
+     */
+    var objects = [];
+    for (var i = 0; i < count; i++) {
+        objects.push({
+            pos: new three.Vector3(),
+            color: new three.Vector4()
+        });
+    }
+
+
+    var pointArray = [];
+    var colorArray = [];
+
+    for (var i = 0; i < count; i++) {
+        pointArray.push(0, 0, 0);
+        colorArray.push(1, 1, 1, 1);
+    }
+
+    var pointGeometry = new three.BufferGeometry();
+    var pos_attr = new THREE.Float32BufferAttribute(pointArray, 3);
+    var col_attr = new THREE.Float32BufferAttribute(colorArray, 4);
+    pointGeometry.setAttribute('position', pos_attr);
+    pointGeometry.setAttribute('color', col_attr);
+    pointGeometry.computeBoundingSphere();
+
+    function apply() {
+        for (var i = 0; i < count; i++) {
+            pos_attr.set(objects[i].pos, i * 3);
+            col_attr.set(objects[i].color, i * 4);
+        }
+        pos_attr.needsUpdate = true;
+        col_attr.needsUpdate = true;
+    }
+
+    /**
+     * 
+     * @param {(i: number, obj: three_pts_instance)=>{}} fn 
+     */
+    function applyEach(fn) {
+        for (var i = 0; i < count; i++) {
+            fn(i, objects[i]);
+            pos_attr.set(objects[i].pos, i * 3);
+            col_attr.set(objects[i].color, i * 4);
+        }
+        pos_attr.needsUpdate = true;
+        col_attr.needsUpdate = true;
+    }
+
+    return {
+        mesh: instancedGeo,
+        apply: apply,
+        for: applyEach,
+        points: objects
+    };
+}
+

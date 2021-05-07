@@ -9,3 +9,4 @@ export * from "./segments";
 export * from "./denote/text"
 export * from "./component-lite";
 export * from "./store";
+export * from "./composed-obj";
