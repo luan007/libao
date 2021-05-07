@@ -24,9 +24,10 @@ import { eased, EasedValue, loop, spring, SpringValue } from "./ticker";
     var comp = {
         data: obj,
         update: update_function,
-        visibility: spring({
-            damping: 0.8
-        })
+        // visibility: spring({
+        //     damping: 0.8
+        // }),
+        visibility: eased(0, 1, 0.1, 0.0000001)
     };
     target.push(comp);
     return comp;
