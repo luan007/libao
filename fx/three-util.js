@@ -405,6 +405,7 @@ export async function threeLoadCubeTextureAsync(urls, key = 'CubeTexture_' + Mat
 }
 
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader"
+import { Points } from "three";
 
 export function threeLoadObj(url, key = 'Obj_' + Math.random(), ctx = threeDefaultCtx, cb) {
     ctx.resources = ctx.resources || {};
@@ -483,7 +484,7 @@ export function threeMATtoCSSMAT(matrix) {
  */
 
 /**
- * @typedef {{pos: THREE.Vector3, color: THREE.Color}} three_pts_instance
+ * @typedef {{pos: THREE.Vector3, color: THREE.Vector4}} three_pts_instance
  */
 
 export function threeInstancedMesh(geo, mat, count) {
@@ -552,10 +553,9 @@ export function threePointCloud(mat, count) {
     for (var i = 0; i < count; i++) {
         objects.push({
             pos: new three.Vector3(),
-            color: new three.Vector4()
+            color: new three.Vector4(1, 1, 1, 1)
         });
     }
-
 
     var pointArray = [];
     var colorArray = [];
@@ -566,16 +566,18 @@ export function threePointCloud(mat, count) {
     }
 
     var pointGeometry = new three.BufferGeometry();
-    var pos_attr = new THREE.Float32BufferAttribute(pointArray, 3);
-    var col_attr = new THREE.Float32BufferAttribute(colorArray, 4);
+    var pos_attr = new three.Float32BufferAttribute(pointArray, 3).setUsage(three.DynamicDrawUsage);
+    var col_attr = new three.Float32BufferAttribute(colorArray, 4).setUsage(three.DynamicDrawUsage);
     pointGeometry.setAttribute('position', pos_attr);
     pointGeometry.setAttribute('color', col_attr);
     pointGeometry.computeBoundingSphere();
 
     function apply() {
         for (var i = 0; i < count; i++) {
-            pos_attr.set(objects[i].pos, i * 3);
-            col_attr.set(objects[i].color, i * 4);
+            let pos = objects[i].pos;
+            let col = objects[i].color;
+            pos_attr.setXYZ(i, pos.x, pos.y, pos.z);
+            col_attr.setXYZW(i, col.x, col.y, col.z, col.w);
         }
         pos_attr.needsUpdate = true;
         col_attr.needsUpdate = true;
@@ -588,15 +590,17 @@ export function threePointCloud(mat, count) {
     function applyEach(fn) {
         for (var i = 0; i < count; i++) {
             fn(i, objects[i]);
-            pos_attr.set(objects[i].pos, i * 3);
-            col_attr.set(objects[i].color, i * 4);
+            let pos = objects[i].pos;
+            let col = objects[i].color;
+            pos_attr.setXYZ(i, pos.x, pos.y, pos.z);
+            col_attr.setXYZW(i, col.x, col.y, col.z, col.w);
         }
         pos_attr.needsUpdate = true;
         col_attr.needsUpdate = true;
     }
 
     return {
-        mesh: instancedGeo,
+        mesh: new Points(pointGeometry, mat),
         apply: apply,
         for: applyEach,
         points: objects

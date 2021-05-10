@@ -37,3 +37,5 @@ export * from "./glue/adaptors"
 export * from "./glue/mirrors"
 export * from "./glue/gasset"
 import "./dom/*.less";
+
+export * from "./ix/index.js";
