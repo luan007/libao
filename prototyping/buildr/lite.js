@@ -50,6 +50,11 @@ export var proxy_three_color = (name) => ({
 })
 
 
+/**
+ * @template T
+ * @param {T} obj
+ * @returns {T}
+ */
 export function inspect(obj, name, meta_source = null, gui = defaultDatGUI, global_onchanged) {
     meta_source = meta_source ? ({ ...meta_source, ...obj }) : obj;
 
@@ -146,6 +151,8 @@ export function inspect(obj, name, meta_source = null, gui = defaultDatGUI, glob
     if (content == 0) {
         gui.removeFolder(folder);
     }
+
+    return obj;
 }
 
 

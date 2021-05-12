@@ -1,6 +1,7 @@
 //this is another try on making smart objects
 
 import { loop } from "./ticker"
+import * as gui from "dat.gui";
 
 
 
@@ -41,6 +42,7 @@ export function co_loop(fn) { //some process to be looped
     return looper; //controllable :)
 }
 
+
 //currently, does nothing.
 /**
  * @template T
@@ -48,15 +50,6 @@ export function co_loop(fn) { //some process to be looped
  * @returns {T}
  */
 export function co_data(d, key) {
-    //mvvm data chunk,
-    //where you can watch? some shit?
-    //if data changes, report, react?
-    
-    //what is data,
-    //data drives everything
-    
-    //transparent?
-
     return d;
 }
 

@@ -108,5 +108,5 @@ export function domMakeShowBox({
 
     setTimeout(() => {
         update();
-    }, 500)
+    }, 100)
 }
