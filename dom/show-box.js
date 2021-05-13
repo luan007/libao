@@ -88,7 +88,7 @@ export function domMakeShowBox({
         // var x = good_w / 2 - real_w * scale / 2;
         // var y = good_h / 2 - real_h * scale / 2;
         // d.style.transform = `translate(${x}px, ${y}px)`;
-        child.style.transform = `scale(${scale.toFixed(3)})`;
+        child.style.transform = `scale(${scale.toFixed(10)})`;
         d.style.width = real_w * scale + "px";
         d.style.height = real_h * scale + "px";
 
