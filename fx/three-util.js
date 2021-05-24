@@ -543,7 +543,8 @@ export function threeInstancedMesh(geo, mat, count) {
     };
 }
 
-export function threePointCloud(mat, count) {
+
+export function threePointCloud(mat, count, attributes = {}) {
     //get bunch of stuff, quick
 
     /**
@@ -553,7 +554,7 @@ export function threePointCloud(mat, count) {
     for (var i = 0; i < count; i++) {
         objects.push({
             pos: new three.Vector3(),
-            color: new three.Vector4(1, 1, 1, 1)
+            color: new three.Vector4(1, 1, 1, 1),
         });
     }
 
@@ -570,6 +571,32 @@ export function threePointCloud(mat, count) {
     var col_attr = new three.Float32BufferAttribute(colorArray, 4).setUsage(three.DynamicDrawUsage);
     pointGeometry.setAttribute('position', pos_attr);
     pointGeometry.setAttribute('color', col_attr);
+
+
+    var attribute_map = {
+        'v3': { l: 3, generator: () => new three.Vector3(), apply: (attr, i, obj) => { attr.setXYZ(i, obj.x, obj.y, obj.z) } },
+        'v4': { l: 4, generator: () => new three.Vector4(), apply: (attr, i, obj) => { attr.setXYZW(i, obj.x, obj.y, obj.z, obj.w) } },
+        'f': { l: 1, generator: () => 0, apply: (attr, i, obj) => { attr.setX(i, obj) } },
+    };
+
+    var arrs = {};
+    var attrs = {};
+    var attrMap = {};
+    for (var a in attributes) {
+        arrs[a] = [];
+        var type = attribute_map[attributes[a]]
+        for (var i = 0; i < count; i++) {
+            objects[i][a] = type.generator();
+            for (var l = 0; l < type.l; l++) {
+                arrs[a].push(0);
+            }
+        }
+        attrMap[a] = type;
+        attrs[a] = new three.Float32BufferAttribute(arrs[a], type.l).setUsage(three.DynamicDrawUsage);
+        pointGeometry.setAttribute(a, attrs[a]);
+    }
+
+
     pointGeometry.computeBoundingSphere();
 
     function apply() {
@@ -578,9 +605,19 @@ export function threePointCloud(mat, count) {
             let col = objects[i].color;
             pos_attr.setXYZ(i, pos.x, pos.y, pos.z);
             col_attr.setXYZW(i, col.x, col.y, col.z, col.w);
+            for (var a in attrs) {
+                attrMap[a].apply(attrs[a], i, objects[i][a]);
+            }
         }
         pos_attr.needsUpdate = true;
         col_attr.needsUpdate = true;
+        for (var i in attrs) {
+            attrs[i].needsUpdate = true;
+        }
+    }
+
+    function get(i) {
+        return objects[i];
     }
 
     /**
@@ -594,16 +631,23 @@ export function threePointCloud(mat, count) {
             let col = objects[i].color;
             pos_attr.setXYZ(i, pos.x, pos.y, pos.z);
             col_attr.setXYZW(i, col.x, col.y, col.z, col.w);
+            for (var a in attrs) {
+                attrMap[a].apply(attrs[a], i, objects[i][a]);
+            }
         }
         pos_attr.needsUpdate = true;
         col_attr.needsUpdate = true;
+        for (var i in attrs) {
+            attrs[i].needsUpdate = true;
+        }
     }
 
     return {
         mesh: new Points(pointGeometry, mat),
         apply: apply,
         for: applyEach,
-        points: objects
+        points: objects,
+        get
     };
 }
 

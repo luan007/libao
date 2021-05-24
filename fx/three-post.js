@@ -51,6 +51,7 @@ export var threeFXComposer = ({ skipRenderPass = false }, ctx = threeDefaultCtx)
     var clock = new three.Clock();
     const composer = new EffectComposer(ctx.renderer, {
         frameBufferType: HalfFloatType,
+        stencilBuffer: true,
         depthBuffer: true
     });
     ctx.composer = composer;
@@ -297,8 +298,8 @@ export var threeFXTiltShiftPass = ({
     const hor = new postprocessing.ShaderPass(horShader, "tDiffuse");
     const ver = new postprocessing.ShaderPass(verShader, "tDiffuse");
     function update() {
-        horShader.uniforms.h.value = 1 / window.innerWidth * params.hv_amount;
-        verShader.uniforms.v.value = 1 / window.innerHeight * params.hv_amount;
+        horShader.uniforms.h.value = 1 / ctx.renderer.width * params.hv_amount;
+        verShader.uniforms.v.value = 1 / ctx.renderer.height * params.hv_amount;
         horShader.uniforms.r.value = params.r;
         verShader.uniforms.r.value = params.r;
         verShader.uniforms.f.value = params.focus_area;
