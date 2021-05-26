@@ -23,8 +23,8 @@ export function threeCameraFrustrum(ctx = threeDefaultCtx) {
 export function threeUpdateFrustrum(ctx = threeDefaultCtx) {
     ctx.camera.updateMatrix(); // make sure camera's local matrix is updated
     ctx.camera.updateMatrixWorld(); // make sure camera's world matrix is updated
-    ctx.camera.matrixWorldInverse.getInverse(ctx.camera.matrixWorld);
-    ctx.frustum.setFromMatrix(new three.Matrix4().multiply(ctx.camera.projectionMatrix, ctx.camera.matrixWorldInverse));
+    ctx.camera.matrixWorldInverse.copy(ctx.camera.matrixWorld).invert();
+    ctx.frustrum.setFromProjectionMatrix(new three.Matrix4().multiplyMatrices(ctx.camera.projectionMatrix, ctx.camera.matrixWorldInverse));
 }
 
 export function threeFrustrumVisible(vec, ctx = threeDefaultCtx) {

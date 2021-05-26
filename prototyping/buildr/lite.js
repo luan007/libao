@@ -91,8 +91,9 @@ export function inspect(obj, name, meta_source = null, gui = defaultDatGUI, glob
             item = folder.add(obj, v)
         } else if (meta.type == 'func') {
             if (meta['func']) {
-                meta[v] = meta['func'].bind(obj);
-                item = folder.add(meta, v)
+                var o = {}
+                o[v] = meta['func'].bind(obj);
+                item = folder.add(o, v)
             }
             else {
                 item = folder.add(obj, v)
