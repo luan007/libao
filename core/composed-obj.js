@@ -39,6 +39,7 @@ export function co_loop(fn) { //some process to be looped
     loop((t, dt) => {
         looper.enabled && fn(t, dt);
     });
+    //TODO: we need sortable loops
     return looper; //controllable :)
 }
 

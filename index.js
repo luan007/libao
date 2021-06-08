@@ -39,3 +39,5 @@ export * from "./glue/gasset"
 import "./dom/*.less";
 
 export * from "./ix/index.js";
+
+export * as next from "./next/index.js";
