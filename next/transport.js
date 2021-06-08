@@ -9,7 +9,6 @@ export function NX_Transport({
     this.io = io(addr);
     this.io.connect();
 
-
     this.rpc = () => {
         
     };
