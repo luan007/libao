@@ -40,4 +40,4 @@ import "./dom/*.less";
 
 export * from "./ix/index.js";
 
-// export * as next from "./next/index.js";
+export * from "./next/index.js";
