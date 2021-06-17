@@ -14,9 +14,7 @@ var glue_managed = {
     addrs: {}
 };
 
-var glue_log = function() {
-    
-}
+var glue_log = function () { }
 
 export var glue2ManagedAddrs = glue_managed;
 
@@ -26,7 +24,7 @@ function glue2ListenOnAddr(addr) {
 
     var _Scope = boi.env.Scope;
 
-    boi.sub("glue.set." + _Scope + ".*." + addr, (err, msg) => {
+    boi.sub("glue.set." + _Scope + "." + addr, (err, msg) => {
         if (err || !msg.body || !msg.body.addr) return;
         if (!glue_managed.addrs[msg.body.addr]) {
             glue2Ref(msg.body.addr, msg.body.value, msg.body.version)
@@ -45,7 +43,7 @@ function glue2ListenOnAddr(addr) {
         }
     });
 
-    boi.sub("glue.sync." + _Scope + ".*." + addr, (err, msg) => {
+    boi.sub("glue.sync." + _Scope + "." + addr, (err, msg) => {
         if (err || !msg.body || !msg.body.addr) return;
         if (!glue_managed.addrs[msg.body.addr]) {
             glue2Ref(msg.body.addr, msg.body.value, msg.body.version)
@@ -73,7 +71,7 @@ function glue2ListenOnAddr(addr) {
         }
     });
 
-    boi.sub("glue.ask." + _Scope + ".*." + addr, (err, msg) => {
+    boi.sub("glue.ask." + _Scope + "." + addr, (err, msg) => {
         if (err || !msg.body || !msg.body.addr) return;
         if (!glue_managed.addrs[msg.body.addr]) {
             glue2Ref(msg.body.addr, msg.body.value, msg.body.version)
@@ -100,6 +98,7 @@ function glue2ListenOnAddr(addr) {
             }
         }
     });
+
 }
 
 export function glue2CatchAllTraffic() {
@@ -109,7 +108,7 @@ export function glue2CatchAllTraffic() {
 
 export function glue2EnableTransport(Scope = boi.env.Scope) {
     //or lets just transmit
-    boi.sub("glue.collect." + Scope + ".*", (err, msg) => {
+    boi.sub("glue.collect." + Scope, (err, msg) => {
         for (var i in glue_managed.addrs) {
             if (glue_managed.addrs[i].type == 'value') {
                 glue2Sync(
@@ -125,7 +124,7 @@ export function glue2EnableTransport(Scope = boi.env.Scope) {
 export function glue2Collect() { //are you sure? this is for debugger only!
     //
     console.warn("Glue2 - Broadcasting Collect Request - Expect ripples.");
-    boi.pub("glue.collect." + boi.env.Scope + "." + boi.env.Entity, { req: Date.now() })
+    boi.pub("glue.collect." + boi.env.Scope, { req: Date.now() })
 }
 
 export function glue2Set(addr, value, force = false, version = null) { //are you looking for doing this in a reckless manner?
@@ -134,7 +133,7 @@ export function glue2Set(addr, value, force = false, version = null) { //are you
         //return;
         console.warn("Setting [", addr, "] with no local registration.");
         //or lets just transmit
-        boi.pub("glue.set." + boi.env.Scope + "." + boi.env.Entity + "." + addr, {
+        boi.pub("glue.set." + boi.env.Scope + "." + addr, {
             addr: addr,
             value: value,
             version: -1
@@ -154,7 +153,7 @@ export function glue2Set(addr, value, force = false, version = null) { //are you
             else {
                 return;
             }
-            boi.pub("glue.set." + boi.env.Scope + "." + boi.env.Entity + "." + addr, {
+            boi.pub("glue.set." + boi.env.Scope + "." + addr, {
                 addr: addr,
                 value: value,
                 version: version == null ? (local.version) : version
@@ -163,7 +162,7 @@ export function glue2Set(addr, value, force = false, version = null) { //are you
         else {
             // local.version = Date.now();
             local.cmd_value = (value);
-            boi.pub("glue.set." + boi.env.Scope + "." + boi.env.Entity + "." + addr, {
+            boi.pub("glue.set." + boi.env.Scope + "." + addr, {
                 addr: addr,
                 value: local.cmd_value,
                 version: Date.now()
@@ -180,7 +179,7 @@ export function glue2Sync(addr, value, version, is_remote) { //are you looking f
         console.warn("Reporting [", addr, "] with no local registration.");
         glue2Ref(addr, value)
     }
-    boi.pub("glue.sync." + boi.env.Scope + "." + boi.env.Entity + "." + addr, {
+    boi.pub("glue.sync." + boi.env.Scope + "." + addr, {
         addr: addr,
         value: value,
         version: version,
@@ -193,7 +192,7 @@ export function glue2AskForUpdate(addr, version, value) { //are you looking for 
     if (!glue_managed.addrs[addr]) {
         return;
     }
-    boi.pub("glue.ask." + boi.env.Scope + "." + boi.env.Entity + "." + addr, {
+    boi.pub("glue.ask." + boi.env.Scope + "." + addr, {
         addr: addr,
         version: version,
         value: value
@@ -294,13 +293,13 @@ export function glue2Object(obj, prefix = "/glue2/", auto_expand = false) { //th
         register(i);
     }
 
-    // if (auto_expand) {
-    //     vue.watch(R, () => {
-    //         for (var i in R) {
-    //             register(i);
-    //         }
-    //     });
-    // }
+    if (auto_expand) {
+        vue.watch(R, () => {
+            for (var i in R) {
+                register(i);
+            }
+        });
+    }
     return R;
 }
 
