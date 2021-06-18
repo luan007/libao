@@ -98,7 +98,6 @@ function glue2ListenOnAddr(addr) {
             }
         }
     });
-
 }
 
 export function glue2CatchAllTraffic() {
