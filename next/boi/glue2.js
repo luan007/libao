@@ -38,7 +38,7 @@ function glue2ListenOnAddr(addr) {
             } else if (glue_managed.addrs[msg.body.addr].type == 'remote_value') {
                 glue_managed.addrs[msg.body.addr].cmd_value = (msg.body.value); //set to local
                 // glue_managed.addrs[msg.body.addr].version = (msg.body.version); //set to new
-                // glue_managed.addrs[msg.body.addr].ev.emit("changedByRemote", msg.body.value);
+                glue_managed.addrs[msg.body.addr].ev.emit("changedByRemote", msg.body.value);
             }
         }
     });
@@ -348,6 +348,10 @@ function _glue2Object_reg(i, o, R, RAW) {
             glue2Sync(o.addr, R[i], o.version);
         } else {
             //ignore change
+            if (o.synced) {
+                R[_remote] = o.cmd_value;
+            }
+            R[i] = o.cmd_value;
         }
         start_watch();
     })
