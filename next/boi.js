@@ -514,7 +514,9 @@ async function join(servers = boi.defaultServers, opts = {
     waitOnFirstConnect: true,
     noRandomize: true,
     noEcho: true,
-    reconnectTimeWait: 150
+    reconnectTimeWait: 500,
+    pingInterval: 3 * 1000, //3s
+    maxPingOut: 3,
 }) {
     opts = {
         ...{
@@ -522,7 +524,9 @@ async function join(servers = boi.defaultServers, opts = {
             noRandomize: true,
             maxReconnectAttempts: -1,
             waitOnFirstConnect: true,
-            reconnectTimeWait: 150
+            reconnectTimeWait: 500,
+            pingInterval: 3 * 1000, //3s
+            maxPingOut: 3,
         },
         ...opts,
     }

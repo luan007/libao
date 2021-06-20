@@ -254,7 +254,6 @@ export function glue2RefSynced(addr, value = null, version = 0) {
     return syn;
 }
 
-
 ////////HIGHER ORDER FUNCTIONS
 
 export function glue2Object(obj, prefix = "/glue2/", auto_expand = false) { //this one is pure evil
