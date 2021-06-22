@@ -118,12 +118,38 @@ export function glue2EnableTransport(Scope = boi.env.Scope) {
             }
         }
     });
+
+    boi.sub("glue.collectAll", (err, msg) => {
+        for (var i in glue_managed.addrs) {
+            if (glue_managed.addrs[i].type == 'value') {
+                glue2Sync(
+                    glue_managed.addrs[i].addr,
+                    glue_managed.addrs[i].value,
+                    glue_managed.addrs[i].version
+                )
+            }
+        }
+    });
 }
 
 export function glue2Collect() { //are you sure? this is for debugger only!
     //
     console.warn("Glue2 - Broadcasting Collect Request - Expect ripples.");
     boi.pub("glue.collect." + boi.env.Scope, { req: Date.now() })
+}
+
+
+export function glue2CollectAll() { //are you sure? this is for debugger only!
+    //
+    console.warn("Glue2 - Broadcasting Collect Request - Expect ripples.");
+    boi.pub("glue.collectAll", { req: Date.now() })
+}
+
+
+export function glue2CollectScope(scope = boi.env.Scope) { //are you sure? this is for debugger only!
+    //
+    console.warn("Glue2 - Broadcasting Collect Request - Expect ripples.");
+    boi.pub("glue.collect." + scope, { req: Date.now() })
 }
 
 export function glue2Set(addr, value, force = false, version = null) { //are you looking for doing this in a reckless manner?
