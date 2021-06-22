@@ -3,6 +3,9 @@
 var ev = require('eventemitter2');
 ev.EventEmitter2.defaultMaxListeners = 30;
 
+import __ from "lodash";
+export var _ = __;
+
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 //according to https://stackoverflow.com/questions/53558916/babel-7-referenceerror-regeneratorruntime-is-not-defined
