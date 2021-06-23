@@ -219,6 +219,7 @@ export function loop(func_or_obj) {
         return;
     }
     all.push(func);
+    return func_or_obj;
 }
 
 export function loopSloppy(func, func_idle = false, skip = 1, total = 2) {

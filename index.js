@@ -48,3 +48,11 @@ import "./dom/*.less";
 export * from "./ix/index.js";
 
 export * from "./next/index.js";
+
+
+import * as mat from "gl-matrix";
+
+export var vec3 = mat.vec3;
+export var vec2 = mat.vec2;
+export var vec4 = mat.vec4;
+export var mat3 = mat.mat3;

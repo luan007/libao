@@ -1,4 +1,4 @@
-import { boi } from "../boi";
+import { boi } from "./boi";
 
 import { vue } from "../../";
 //mark object into addressable

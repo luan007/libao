@@ -482,11 +482,6 @@ export function threeMATtoCSSMAT(matrix) {
 /**
  * @typedef {{mat: THREE.Object3D, color: THREE.Color}} three_instance
  */
-
-/**
- * @typedef {{pos: THREE.Vector3, color: THREE.Vector4}} three_pts_instance
- */
-
 export function threeInstancedMesh(geo, mat, count) {
     //get bunch of stuff, quick
     var instancedGeo = new three.InstancedMesh(geo, mat, count);
@@ -544,6 +539,9 @@ export function threeInstancedMesh(geo, mat, count) {
 }
 
 
+/**
+ * @typedef {{pos: THREE.Vector3, color: THREE.Vector4}} three_pts_instance
+ */
 export function threePointCloud(mat, count, attributes = {}) {
     //get bunch of stuff, quick
 
@@ -647,6 +645,114 @@ export function threePointCloud(mat, count, attributes = {}) {
         apply: apply,
         for: applyEach,
         points: objects,
+        get
+    };
+}
+
+
+export function threeLines(mat, count, attributes = {}) {
+    //get bunch of stuff, quick
+
+    /**
+     * @type {three_pts_instance[]}
+     */
+    var objects = [];
+    for (var i = 0; i < count; i++) {
+        objects.push({
+            pos: new three.Vector3(),
+            color: new three.Vector4(1, 1, 1, 1),
+        });
+    }
+
+    var pointArray = [];
+    var colorArray = [];
+
+    for (var i = 0; i < count; i++) {
+        pointArray.push(0, 0, 0);
+        colorArray.push(1, 1, 1, 1);
+    }
+
+    var pointGeometry = new three.BufferGeometry();
+    var pos_attr = new three.Float32BufferAttribute(pointArray, 3).setUsage(three.DynamicDrawUsage);
+    var col_attr = new three.Float32BufferAttribute(colorArray, 4).setUsage(three.DynamicDrawUsage);
+    pointGeometry.setAttribute('position', pos_attr);
+    pointGeometry.setAttribute('color', col_attr);
+
+
+    var attribute_map = {
+        'v3': { l: 3, generator: () => new three.Vector3(), apply: (attr, i, obj) => { attr.setXYZ(i, obj.x, obj.y, obj.z) } },
+        'v4': { l: 4, generator: () => new three.Vector4(), apply: (attr, i, obj) => { attr.setXYZW(i, obj.x, obj.y, obj.z, obj.w) } },
+        'f': { l: 1, generator: () => 0, apply: (attr, i, obj) => { attr.setX(i, obj) } },
+    };
+
+    var arrs = {};
+    var attrs = {};
+    var attrMap = {};
+    for (var a in attributes) {
+        arrs[a] = [];
+        var type = attribute_map[attributes[a]]
+        for (var i = 0; i < count; i++) {
+            objects[i][a] = type.generator();
+            for (var l = 0; l < type.l; l++) {
+                arrs[a].push(0);
+            }
+        }
+        attrMap[a] = type;
+        attrs[a] = new three.Float32BufferAttribute(arrs[a], type.l).setUsage(three.DynamicDrawUsage);
+        pointGeometry.setAttribute(a, attrs[a]);
+    }
+
+
+    pointGeometry.computeBoundingSphere();
+
+    function apply() {
+        for (var i = 0; i < count; i++) {
+            let pos = objects[i].pos;
+            let col = objects[i].color;
+            pos_attr.setXYZ(i, pos.x, pos.y, pos.z);
+            col_attr.setXYZW(i, col.x, col.y, col.z, col.w);
+            for (var a in attrs) {
+                attrMap[a].apply(attrs[a], i, objects[i][a]);
+            }
+        }
+        pos_attr.needsUpdate = true;
+        col_attr.needsUpdate = true;
+        for (var i in attrs) {
+            attrs[i].needsUpdate = true;
+        }
+    }
+
+    function get(i) {
+        return objects[i];
+    }
+
+    /**
+     * 
+     * @param {(i: number, obj: three_pts_instance)=>{}} fn 
+     */
+    function applyEach(fn) {
+        for (var i = 0; i < count; i++) {
+            fn(i, objects[i]);
+            let pos = objects[i].pos;
+            let col = objects[i].color;
+            pos_attr.setXYZ(i, pos.x, pos.y, pos.z);
+            col_attr.setXYZW(i, col.x, col.y, col.z, col.w);
+            for (var a in attrs) {
+                attrMap[a].apply(attrs[a], i, objects[i][a]);
+            }
+        }
+        pos_attr.needsUpdate = true;
+        col_attr.needsUpdate = true;
+        for (var i in attrs) {
+            attrs[i].needsUpdate = true;
+        }
+    }
+
+    return {
+        mesh: new three.Line(pointGeometry, mat),
+        apply: apply,
+        for: applyEach,
+        verts: objects,
         get
     };
 }
