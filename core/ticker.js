@@ -280,11 +280,16 @@ export function looperInterval(key, span) {
 
 var _value_lib = {};
 var _value_keys = {};
-export function changed(key, cur) {
-    var changed = _value_lib[key] != cur;
+export function changed(key, cur, skip_first = 1) {
+    if (_value_keys[key] == undefined && skip_first) {
+        _value_lib[key] = cur;
+        _value_keys[key] = 1;
+        return false;
+    }
+    var cc = _value_lib[key] != cur;
     _value_lib[key] = cur;
     _value_keys[key] = 1;
-    return changed;
+    return cc;
 }
 
 loop(_update_eased);

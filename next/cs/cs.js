@@ -6,12 +6,12 @@
  * 
  */
 
-import { changed, co_loop, ease, fetchYamlAsync, three, yaml } from "../../index";
+import { changed, co_loop, ease, fetchYamlAsync, three, yaml, Vue } from "../../index";
 import { defaultDatGUI, inspect, m_func, m_number, m_text, prep } from "../../prototyping/buildr/lite";
 import { nanoid } from 'nanoid'
 import * as _ from "lodash"
 import * as res from "resolve-relative-url";
-import * as nextComps from "./vuecs_comps/*.vue";
+import * as nextComps from "../vue_comps/*.vue";
 import * as ev2 from "eventemitter2";
 
 var bus = new ev2.EventEmitter2({
@@ -20,11 +20,11 @@ var bus = new ev2.EventEmitter2({
 });
 
 prep();
-export function cs_vue2ImportNext(components, prefix = "") {
+export function cs_vue2ImportNext(prefix = "") {
     for (var i in nextComps) {
         if (i == 'default') continue;
         console.log(i);
-        Vue.component(prefix + i, components[i].default)
+        Vue.component(prefix + i, nextComps[i].default)
     }
 }
 
@@ -104,6 +104,39 @@ export function cs_get_comp(type) {
     return null;
 }
 
+/**
+ * 
+ * @param {*} _key 
+ * @param {*} cfg 
+ * @param {(t: comp_base)=>any} ctr_fn 
+ * @returns 
+ */
+export function comp_local(_key, cfg, ctr_fn) {
+    var mgr = new (class extends comp_base {
+        constructor(key, data) {
+            super(key, data);
+            this.data = {
+                ...this.data,
+                ...cfg.data ?? {}
+            },
+                this.eased = {
+                    ...this.eased,
+                    ...cfg.eased ?? {}
+                };
+            this.meta = {
+                ...this.meta,
+                ...cfg.meta ?? {}
+            };
+            this.fn = ctr_fn;
+        }
+        onInit() {
+            super.onInit();
+            this.fn(this);
+        }
+    })(_key, {});
+    return mgr;
+}
+
 export class comp_base {
     constructor(key, data, no_registry = false) {
         if (key) {
@@ -127,7 +160,7 @@ export class comp_base {
         this.events = new ev2.EventEmitter2({
             wildcard: true
         });
-        
+
         /**
          * @member bus 
          * 
@@ -138,7 +171,7 @@ export class comp_base {
         this.bus = bus;
 
 
-        
+
         this.data = {
             viz: 1,
         }
@@ -184,7 +217,7 @@ export class comp_base {
         this.data.tweak && inspect(this.data, this.constructor.name + "#" + this.key, this.meta);
         if (this.has_data) {
             cs_pure_data[this.key] = this.data; //link to data now
-            cs_defaults_data[this.key] = _.cloneDeep(this.data);
+            cs_defaults_data[this.key] = this.no_defaults ? {} : _.cloneDeep(this.data);
         }
     }
 
@@ -238,10 +271,14 @@ export class comp_vue extends comp_base {
 
         this.data = {
             viz: 0,
+            threshold: 0.1,
             ...this.data
         };
 
+        this.runtime = {};
         this.data.vdata = this.data.vdata || {};
+        this.data.vdata = _.defaultsDeep(this.data.vdata, vue_data);
+
         this.cfg = {
             selected: 0,
             viz: 0,
@@ -252,7 +289,7 @@ export class comp_vue extends comp_base {
         this.vue_chunk = {
             type: this.data.vtype,
             data: {
-                cfg: this.cfg, data: { ...vue_data, ...this.data.vdata }
+                cfg: this.cfg, data: this.data.vdata, runtime: this.runtime
             }
         }
 
@@ -268,7 +305,7 @@ export class comp_vue extends comp_base {
         co_loop(() => {
             this.cfg.show = this.eased.viz > this.data.threshold && this.data.viz > 0; //give a bit
             this.cfg.disp = this.eased.viz > 0 || this.data.viz > 0; //safe?
-            this.cfg.viz = ao.ease(this.cfg.viz, this.data.viz, 0.1, 0.0001)
+            this.cfg.viz = ease(this.cfg.viz, this.data.viz, 0.1, 0.0001)
         });
 
         ui_add_vue(this.vue_chunk);
@@ -438,7 +475,6 @@ export class cs_comp_route_mgr extends comp_base {
         exec(route_cfg, match)
         _.merge(cs_pure_data, final);
     }
-
 
     onInit() {
         var meta2 = {};
