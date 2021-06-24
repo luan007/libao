@@ -12,9 +12,14 @@ import { nanoid } from 'nanoid'
 import * as _ from "lodash"
 import * as res from "resolve-relative-url";
 import * as nextComps from "./vuecs_comps/*.vue";
+import * as ev2 from "eventemitter2";
+
+var bus = new ev2.EventEmitter2({
+    wildcard: true,
+    maxListeners: 1000
+});
 
 prep();
-
 export function cs_vue2ImportNext(components, prefix = "") {
     for (var i in nextComps) {
         if (i == 'default') continue;
@@ -110,11 +115,34 @@ export class comp_base {
             this.key = nanoid();
             cs_hidden_comps[key] = this;
         }
+
+
+        /**
+         * @member events 
+         * 
+         * 事件节点 (IoC Pattern)
+         * 
+         * [ **当前** ]Component独有的事件发射、接收器。
+         */
+        this.events = new ev2.EventEmitter2({
+            wildcard: true
+        });
+        
+        /**
+         * @member bus 
+         * 
+         * 事件总线 (IoC Pattern)
+         * 
+         * [ **所有** ]Component共享的事件发射、接收器。
+         */
+        this.bus = bus;
+
+
+        
         this.data = {
             viz: 1,
         }
         _.merge(this.data, data); //why? intellisense
-
         this.eased = {
             viz: 0
         };
@@ -328,7 +356,7 @@ import { ui_add_vue } from "../ui";
 import { vue2ImportAll } from "../../fx";
 function noop() { }
 
-export class comp_route_mgr extends comp_base {
+export class cs_comp_route_mgr extends comp_base {
     constructor(key, data) {
         super(key, data, true);
 
@@ -364,7 +392,7 @@ export class comp_route_mgr extends comp_base {
     handler(match, route_cfg = {}) {
         var final = {};
         var mergeSet = (o, p, v) => (
-            _.set(o, p, _.merge(_.cs_get(o, p), v))
+            _.set(o, p, _.merge(_.get(o, p), v))
         )
         if (!route_cfg.preserve) {
             final = _.merge(final, cs_defaults_data);
@@ -447,7 +475,7 @@ export class comp_route_mgr extends comp_base {
     }
 }
 
-export class comp_cfg_exporter extends comp_base {
+export class cs_comp_cfg_exporter extends comp_base {
     constructor(key, data) {
         super(key, data, true);
 
@@ -475,7 +503,7 @@ export class comp_cfg_exporter extends comp_base {
     }
 }
 
-reg_component("route_mgr", comp_route_mgr)
-reg_component("cfg_exporter", comp_cfg_exporter)
+reg_component("route_mgr", cs_comp_route_mgr)
+reg_component("cfg_exporter", cs_comp_cfg_exporter)
 reg_component("vue", comp_vue);
 reg_component("three", comp_three);
