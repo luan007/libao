@@ -507,7 +507,12 @@ export class cs_comp_route_mgr extends comp_base {
                 this.applyRoute();
             }
         })
-        this.applyRoute();
+
+        setTimeout(() => {
+            this.applyRoute();
+        }, 500);
+
+        //add safety check.
     }
 }
 

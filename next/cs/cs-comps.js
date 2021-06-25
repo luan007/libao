@@ -83,14 +83,13 @@ export class cs_env_camera extends comp_three {
                 rx: 0,
                 ry: 0,
                 rz: 0,
-                r_e: 0.1,
+                r_e: 0.04,
 
                 z: 0,
-                z_e: 0.1,
+                z_e: 0.04,
 
                 fov: 50,
-                fov_e: 0.1,
-
+                fov_e: 0.01,
 
             }
         }
