@@ -42,18 +42,24 @@ export default {
 }
 
 .shell {
-
   .t-slide {
-    transition: all 0.2s ease-in;
+    transition: transform 0.6s ease-in, opacity 0.2s ease;
+  }
+  .t-slide-slow {
+    transition: transform 0.6s ease-in, opacity 0.2s ease;
   }
   .t {
-    transition: all 0.3s ease;
+    transition: transform 0.6s ease-in, opacity 0.2s ease;
   }
 
   &.show {
     .t-slide {
       transition: transform 1.8s cubic-bezier(0, 0.87, 0, 1.01),
         opacity 1.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    .t-slide-slow {
+      transition: transform 2.5s cubic-bezier(0, 0.87, 0, 1.01),
+        opacity 2s cubic-bezier(0.215, 0.61, 0.355, 1);
     }
     .top,
     .left,

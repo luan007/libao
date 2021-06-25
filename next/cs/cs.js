@@ -271,7 +271,7 @@ export class comp_vue extends comp_base {
 
         this.data = {
             viz: 0,
-            threshold: 0.1,
+            threshold: 0.3,
             ...this.data
         };
 
