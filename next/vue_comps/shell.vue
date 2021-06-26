@@ -5,6 +5,9 @@
       show: cfg.show,
       shell: true,
     }"
+    v-bind:style="{
+      transform: `translate(${cfg.offset.x || 0}px, ${cfg.offset.y || 0}px)`,
+    }"
   >
     <slot></slot>
   </div>
@@ -42,6 +45,7 @@ export default {
 }
 
 .shell {
+  position: absolute;
   .t-slide {
     transition: transform 0.6s ease-in, opacity 0.2s ease;
   }

@@ -37,6 +37,7 @@ function glue2ListenOnAddr(addr) {
                 glue_log(msg.body.addr, "=>", msg.body.value);
             } else if (glue_managed.addrs[msg.body.addr].type == 'remote_value') {
                 glue_managed.addrs[msg.body.addr].cmd_value = (msg.body.value); //set to local
+                glue_managed.addrs[msg.body.addr].cmd_version = (msg.body.version); //set to new
                 // glue_managed.addrs[msg.body.addr].version = (msg.body.version); //set to new
                 glue_managed.addrs[msg.body.addr].ev.emit("changedByRemote", msg.body.value);
             }
@@ -51,21 +52,22 @@ function glue2ListenOnAddr(addr) {
         if (msg.body.version == -1 || msg.body.version >= glue_managed.addrs[msg.body.addr].version) {
             if (glue_managed.addrs[msg.body.addr].type == 'value' ||
                 !msg.body.remote) {
+                glue_log(msg.body.addr, "~", msg.body.value);
+                glue_managed.addrs[msg.body.addr].version = (msg.body.version); //set to new
                 if (_.isEqual(glue_managed.addrs[msg.body.addr].value, (msg.body.value))) {
                     return;
                 }
                 glue_managed.addrs[msg.body.addr].value = (msg.body.value); //set to local
-                glue_managed.addrs[msg.body.addr].version = (msg.body.version); //set to new
-                glue_log(msg.body.addr, "~", msg.body.value);
                 glue_managed.addrs[msg.body.addr].ev.emit("syncedByRemote", msg.body.value);
             }
             else if (glue_managed.addrs[msg.body.addr].type == 'remote_value') {
+                console.log("Sync");
+                glue_managed.addrs[msg.body.addr].version = (msg.body.version); //set to new
+                glue_log(msg.body.addr, "~*", msg.body.value);
                 if (_.isEqual(glue_managed.addrs[msg.body.addr].cmd_value, (msg.body.value))) {
                     return;
                 }
                 glue_managed.addrs[msg.body.addr].cmd_value = (msg.body.value); //set to local
-                glue_managed.addrs[msg.body.addr].version = (msg.body.version); //set to new
-                glue_log(msg.body.addr, "~*", msg.body.value);
                 glue_managed.addrs[msg.body.addr].ev.emit("syncedByRemote", msg.body.value);
             }
         }

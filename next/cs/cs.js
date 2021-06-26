@@ -271,7 +271,7 @@ export class comp_vue extends comp_base {
 
         this.data = {
             viz: 0,
-            threshold: 0.3,
+            threshold: 0.9,
             ...this.data
         };
 
@@ -279,11 +279,13 @@ export class comp_vue extends comp_base {
         this.data.vdata = this.data.vdata || {};
         this.data.vdata = _.defaultsDeep(this.data.vdata, vue_data);
 
+
         this.cfg = {
             selected: 0,
             viz: 0,
+            offset: {x: 0, y: 0},
             show: 0, //opacity, transition & so on
-            disp: 0 //display: none?
+            disp: 0, //display: none?
         };
 
         this.vue_chunk = {
@@ -305,7 +307,9 @@ export class comp_vue extends comp_base {
         co_loop(() => {
             this.cfg.show = this.eased.viz > this.data.threshold && this.data.viz > 0; //give a bit
             this.cfg.disp = this.eased.viz > 0 || this.data.viz > 0; //safe?
-            this.cfg.viz = ease(this.cfg.viz, this.data.viz, 0.1, 0.0001)
+            this.cfg.viz = ease(this.cfg.viz, this.data.viz, 0.1, 0.0001);
+            this.cfg.offset.x = this.data.vdata.x ?? 0;
+            this.cfg.offset.y = this.data.vdata.y ?? 0;
         });
 
         ui_add_vue(this.vue_chunk);

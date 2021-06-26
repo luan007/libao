@@ -3,7 +3,9 @@ import * as gui from "dat.gui";
 export var defaultDatGUI;
 
 export function prep() {
-    defaultDatGUI = new gui.GUI()
+    if (!defaultDatGUI) {
+        defaultDatGUI = new gui.GUI()
+    }
 }
 
 export function meta(key, type, meta = {}, onChange) {
