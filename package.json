@@ -21,6 +21,7 @@
     "vue3": "./node_modules/vue3/dist/vue.esm-browser.js"
   },
   "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^3.2.0",
     "core-js": "^3.8.1",
     "dat.gui": "^0.7.7",
     "eventemitter2": "^6.4.4",

@@ -283,6 +283,13 @@ export function glue2RefSynced(addr, value = null, version = 0) {
 
 ////////HIGHER ORDER FUNCTIONS
 
+/**
+ * @template T
+ * @param {T} obj 
+ * @param {*} prefix 
+ * @param {*} auto_expand 
+ * @returns {T}
+ */
 export function glue2Object(obj, prefix = "/glue2/", auto_expand = false) { //this one is pure evil
     var RAW = {};
     var R = vue.reactive(RAW); //final output
