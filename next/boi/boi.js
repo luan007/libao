@@ -71,7 +71,7 @@ class scope {
                 ...opts,
                 callback: cbParseSubject(opts.json ? cbJSON(cb) : cbString(cb)),
             })
-        })
+        }, true)
     }
 
     /**
@@ -88,7 +88,7 @@ class scope {
         return await later(() => boi.io.subscribe(topic, {
             ...opts,
             callback: cb,
-        }))
+        }), true)
     }
 
     /**
@@ -248,7 +248,7 @@ class scope {
             return boi.io.request(subject, opts.json ? asJSON(data) : asString(data), {
                 ...opts
             })
-        })
+        }, true)
     }
 
     /**
@@ -267,7 +267,7 @@ class scope {
             return boi.io.request(subject, data, {
                 ...opts
             })
-        })
+        }, true)
     }
 
 
@@ -299,7 +299,7 @@ class scope {
                     }, msg);
                 })
             })
-        })
+        }, true)
     }
 
 
@@ -333,7 +333,7 @@ class scope {
                     }, msg);
                 })
             })
-        })
+        }, true)
     }
 
 
@@ -530,14 +530,23 @@ async function reset(e) {
  * @param {()=>T} fn 
  * @returns {Promise<T>}
  */
-function later(fn) {
+function later(fn, ensure) {
     return new Promise((res, rej) => {
-
         var captured_res = () => {
             try {
                 if (boi.io.isClosed()) {
-                    reset(new Error("Closed!"));
-                    return rej("Internal Error")
+                    if (ensure) {
+                        later(fn, true).then((r) => {
+                            return res(r);
+                        }).catch((e) => {
+                            return rej(e);
+                        });
+                        reset(new Error("Closed!"));
+                    }
+                    else {
+                        reset(new Error("Closed!"));
+                        return rej("Internal Error")
+                    }
                 }
                 else {
                     var result = fn();
@@ -549,7 +558,6 @@ function later(fn) {
                 return rej("Internal Error")
             }
         }
-
         if (boi.io) {
             return captured_res();
         }
@@ -603,7 +611,6 @@ async function join(servers = boi.defaultServers, opts = {
     }
     opts.servers = servers;
     boi.io = await connect(opts);
-
     boi.io.protocol._close = async () => {
         //it never dies!
         //reset("Underlying structure breaks");
