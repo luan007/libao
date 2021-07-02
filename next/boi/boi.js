@@ -11,6 +11,10 @@ var env = {
     },
 };
 
+var join_busy = false;
+
+var _cached_opts = {};
+
 class scope {
     constructor({
         prefix = "", postfix = "", headers = {}
@@ -445,6 +449,7 @@ export var boi = {
     toSubject: toSubject
 };
 
+global.boi = boi;
 
 
 function enableMessaging() {
@@ -484,6 +489,33 @@ function bind(fn, src) {
     return fn.bind(src);
 }
 
+
+var reset_busy = false;
+async function reset(e) {
+    try {
+        console.warn("Nat.IO Internal failure, bailing out!", e);
+        if (reset_busy) {
+            console.warn("Nat.IO Rebooting.. Busy", e);
+            return;
+        }
+        reset_busy = true;
+        if (boi.io) {
+            // await boi.io.close(); 
+            //nono dont touch!
+        }
+        boi.ready = false;
+        boi.io.protocol.prepare();
+        await boi.io.protocol.dialLoop();
+        boi.io._closed = false;
+        boi.io.protocol._closed = false; //hack
+        reset_busy = false;
+        boi.ready = true;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+
 //this is for simulating socket.io like behaviour
 //register before the connection is ready.
 /**
@@ -492,9 +524,27 @@ function bind(fn, src) {
  * @returns {Promise<T>}
  */
 function later(fn) {
-    return new Promise((res) => {
+    return new Promise((res, rej) => {
+
+        var captured_res = () => {
+            try {
+                if (boi.io.isClosed()) {
+                    reset(new Error("Closed!"));
+                    return rej("Internal Error")
+                }
+                else {
+                    var result = fn();
+                    return res(result);
+                }
+            }
+            catch (e) {
+                reset(e);
+                return rej("Internal Error")
+            }
+        }
+
         if (boi.io) {
-            return res(fn());
+            return captured_res();
         }
         else {
             later.id = later.id || 0;
@@ -502,7 +552,8 @@ function later(fn) {
             // console.warn("BOI Registration is in queue. #" + id);
             boi.state.once("connect", () => {
                 // console.warn("BOI Resolve #" + id);
-                res(fn());
+                captured_res();
+                // return res(fn());
             });
         }
     })
@@ -518,6 +569,15 @@ async function join(servers = boi.defaultServers, opts = {
     pingInterval: 3 * 1000, //3s
     maxPingOut: 3,
 }) {
+    if (join_busy) {
+        console.warn("Nat.IO Joining.. Busy", e);
+        return;
+    }
+    join_busy = true;
+    _cached_opts = {
+        servers,
+        opts
+    };
     opts = {
         ...{
             noEcho: true,
@@ -536,6 +596,12 @@ async function join(servers = boi.defaultServers, opts = {
     }
     opts.servers = servers;
     boi.io = await connect(opts);
+
+    boi.io.protocol._close = async () => {
+        //it never dies!
+        reset("Underlying structure breaks");
+    };
+
     boi.nc = boi.io;
     _parse_states(boi.io);
     boi.state.on(["connect", "reconnect"], () => {
@@ -546,6 +612,7 @@ async function join(servers = boi.defaultServers, opts = {
     })
     enableMessaging();
     boi.state.emit("connect");
+    join_busy = false;
     return boi;
 }
 

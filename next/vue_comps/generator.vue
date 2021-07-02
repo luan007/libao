@@ -3,7 +3,7 @@
     <component
       v-for="(i, j) in ui_elements"
       v-bind:key="'velem_' + j"
-      :is="i.type"
+      :is="i.vtype || i.type"
       v-bind:cfg="i.data.cfg"
       v-bind:runtime="i.data.runtime"
       v-bind="i.data.data"

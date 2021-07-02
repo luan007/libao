@@ -47,8 +47,8 @@ export var cs_defaults_data = {}; //according to this
 
 var cs_hidden_comps = {};
 
-export function reg_component(type, creator) {
-    _proto[type] = creator;
+export function reg_component(key, constructor) {
+    _proto[key] = constructor;
 }
 
 export function reg_component_by_type(creator) {
@@ -118,11 +118,11 @@ export function comp_local(_key, cfg, ctr_fn) {
             this.data = {
                 ...this.data,
                 ...cfg.data ?? {}
-            },
-                this.eased = {
-                    ...this.eased,
-                    ...cfg.eased ?? {}
-                };
+            };
+            this.eased = {
+                ...this.eased,
+                ...cfg.eased ?? {}
+            };
             this.meta = {
                 ...this.meta,
                 ...cfg.meta ?? {}
@@ -137,6 +137,8 @@ export function comp_local(_key, cfg, ctr_fn) {
     return mgr;
 }
 
+
+var rng = 0;
 export class comp_base {
     constructor(key, data, no_registry = false) {
         if (key) {
@@ -170,8 +172,6 @@ export class comp_base {
          */
         this.bus = bus;
 
-
-
         this.data = {
             viz: 1,
         }
@@ -185,6 +185,16 @@ export class comp_base {
         co_loop((t, dt) => { this.update(t, dt) });
         this.inited = false;
         this.mgmt_loops = [];
+    }
+
+    changed(key, cb) {
+        var prev = null;
+        co_loop(() => {
+            if (prev != this.data[key]) {
+                prev = this.data[key];
+                cb(this.data[key]);
+            }
+        });
     }
 
     co_loop(fn) {
@@ -234,7 +244,7 @@ export class comp_base {
         }
         for (var i in this.eased) {
             if (this.data[i] != undefined) {
-                this.eased[i] = ease(this.eased[i], this.data[i], this.data[i + "_e"] || 0.1, 0.00000001);
+                this.eased[i] = ease(this.eased[i], this.data[i], this.data[i + "_e"] || 0.1, this.data[i + "_p"] || 0.00000001);
             }
         }
 
@@ -266,7 +276,7 @@ export class comp_three extends comp_base {
 }
 
 export class comp_vue extends comp_base {
-    constructor(key, data, vue_data = {}) {
+    constructor(key, data, vue_data) {
         super(key, data);
 
         this.data = {
@@ -277,19 +287,21 @@ export class comp_vue extends comp_base {
 
         this.runtime = {};
         this.data.vdata = this.data.vdata || {};
-        this.data.vdata = _.defaultsDeep(this.data.vdata, vue_data);
 
+        if (vue_data) {
+            this.data.vdata = _.mergeWith(this.data.vdata, vue_data);
+        }
 
         this.cfg = {
             selected: 0,
             viz: 0,
-            offset: {x: 0, y: 0},
+            offset: { x: 0, y: 0 },
             show: 0, //opacity, transition & so on
             disp: 0, //display: none?
         };
 
         this.vue_chunk = {
-            type: this.data.vtype,
+            vtype: this.data.vtype,
             data: {
                 cfg: this.cfg, data: this.data.vdata, runtime: this.runtime
             }

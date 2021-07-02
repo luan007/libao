@@ -180,6 +180,8 @@ export function looperSetDeltaTMultiplier(s) {
 }
 
 var all = [];
+var before = [];
+var after = [];
 var removal = [];
 export var t = (Date.now() / 1000) % 1000000;
 export var prevT = (Date.now() / 1000) % 1000000;
@@ -208,8 +210,14 @@ export function tick() {
         removal = [];
         all = _new;
     }
+    for (var i = 0; i < before.length; i++) {
+        before[i](t, deltaT);
+    }
     for (var i = 0; i < all.length; i++) {
         all[i](t, deltaT);
+    }
+    for (var i = 0; i < after.length; i++) {
+        after[i](t, deltaT);
     }
 }
 
@@ -219,6 +227,24 @@ export function loop(func_or_obj) {
         return;
     }
     all.push(func);
+    return func_or_obj;
+}
+
+export function loopBefore(func_or_obj) {
+    var func = func_or_obj.update || func_or_obj;
+    if (before.indexOf(func) >= 0) {
+        return;
+    }
+    before.push(func);
+    return func_or_obj;
+}
+
+export function loopAfter(func_or_obj) {
+    var func = func_or_obj.update || func_or_obj;
+    if (after.indexOf(func) >= 0) {
+        return;
+    }
+    after.push(func);
     return func_or_obj;
 }
 

@@ -1,5 +1,5 @@
 // import "@babel/polyfill" //this has been removed
-console.log("AO IMPORTED")
+
 var ev = require('eventemitter2');
 ev.EventEmitter2.defaultMaxListeners = 0;
 
@@ -43,7 +43,6 @@ export * from "./glue/glue"
 export * from "./glue/adaptors"
 export * from "./glue/mirrors"
 export * from "./glue/gasset"
-import "./dom/*.less";
 
 export * from "./ix/index.js";
 

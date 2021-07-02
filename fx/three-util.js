@@ -542,6 +542,12 @@ export function threeInstancedMesh(geo, mat, count) {
 /**
  * @typedef {{pos: THREE.Vector3, color: THREE.Vector4}} three_pts_instance
  */
+
+
+
+
+
+
 export function threePointCloud(mat, count, attributes = {}) {
     //get bunch of stuff, quick
 
@@ -645,7 +651,7 @@ export function threePointCloud(mat, count, attributes = {}) {
         apply: apply,
         for: applyEach,
         points: objects,
-        get
+        get: get
     };
 }
 
