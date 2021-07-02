@@ -499,6 +499,13 @@ async function reset(e) {
             return;
         }
         reset_busy = true;
+
+        try {
+            boi.io.protocol.transport.close();
+        }
+        catch (e) {
+        }
+
         if (boi.io) {
             // await boi.io.close(); 
             //nono dont touch!
@@ -599,8 +606,26 @@ async function join(servers = boi.defaultServers, opts = {
 
     boi.io.protocol._close = async () => {
         //it never dies!
+        //reset("Underlying structure breaks");
         reset("Underlying structure breaks");
     };
+
+    var cc = boi.io.protocol.heartbeats.cancel.bind(boi.io.protocol.heartbeats);
+    boi.io.protocol.heartbeats.cancel = (stale) => {
+        if (stale) {
+            //FUCK!
+            cc(stale);
+            console.warn("o gee.. No one cares?");
+            if (boi.io.protocol.connected) {
+                console.warn("no, you're not connected.");
+                reset("Protocol hidden crash!");
+            }
+        }
+        else {
+            cc(stale);
+        }
+    }
+
 
     boi.nc = boi.io;
     _parse_states(boi.io);
