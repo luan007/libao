@@ -530,13 +530,13 @@ async function reset(e) {
  * @param {()=>T} fn 
  * @returns {Promise<T>}
  */
-function later(fn, ensure) {
+function later(fn, ensure, closed) {
     return new Promise((res, rej) => {
         var captured_res = () => {
             try {
                 if (boi.io.isClosed()) {
                     if (ensure) {
-                        later(fn, true).then((r) => {
+                        later(fn, true, true).then((r) => {
                             return res(r);
                         }).catch((e) => {
                             return rej(e);
@@ -558,7 +558,7 @@ function later(fn, ensure) {
                 return rej("Internal Error")
             }
         }
-        if (boi.io) {
+        if (boi.io && !closed) {
             return captured_res();
         }
         else {
