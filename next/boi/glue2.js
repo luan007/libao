@@ -275,6 +275,31 @@ export function glue2Ref(addr, value = null, version = 0) {
     return shell;
 }
 
+export function glue2RORef(addr, value = null, version = 0) {
+    if (glue_managed.addrs[addr]) {
+        return glue_managed.addrs[addr];
+    }
+    var shell = {
+        symbol: SYM_GLUE2,
+        type: "remote_value",
+        value: value,
+        cmd_value: value,
+        addr: addr,
+        ev: new ev.EventEmitter2(),
+        version: version,
+        set: () => { },
+    };
+    var temp = {};
+    temp[addr] = (shell);
+    glue_managed.addrs = {
+        ...glue_managed.addrs,
+        ...temp
+    }
+    glue2ListenOnAddr(addr);
+    glue2AskForUpdate(addr, 0);
+    return shell;
+}
+
 export function glue2RefSynced(addr, value = null, version = 0) {
     var syn = glue2Ref(addr, value, version);
     syn.synced = true;
@@ -290,7 +315,7 @@ export function glue2RefSynced(addr, value = null, version = 0) {
  * @param {*} auto_expand 
  * @returns {T}
  */
-export function glue2Object(obj, prefix = "/glue2/", auto_expand = false) { //this one is pure evil
+export function glue2Object(obj, prefix = '/' + boi.env.Entity + '/', auto_expand = false) { //this one is pure evil
     var RAW = {};
     var R = vue.reactive(RAW); //final output
     console.warn("Glue_Object is DEPRECATED & DANGEROUS. It messes up your brain in long run.");
@@ -299,7 +324,7 @@ export function glue2Object(obj, prefix = "/glue2/", auto_expand = false) { //th
         if (registered[i]) return;
         registered[i] = true;
         var value = obj[i];
-        if (typeof value == 'object') {
+        if (typeof value == 'object' && value) {
             if (value.symbol == SYM_GLUE2) {
                 //you've registered yourself
                 _glue2Object_reg(i, value, R, RAW);

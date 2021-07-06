@@ -11,7 +11,7 @@ export var ui_default = {
 
 
 export function ui_add_vue(elem) {
-    console.log(elem);
+    // console.log(elem);
     ui_vue.push(elem);
 }
 

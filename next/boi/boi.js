@@ -505,7 +505,6 @@ async function reset(e) {
         }
         catch (e) {
         }
-
         if (boi.io) {
             // await boi.io.close(); 
             //nono dont touch!
@@ -513,10 +512,12 @@ async function reset(e) {
         boi.ready = false;
         boi.io.protocol.prepare();
         await boi.io.protocol.dialLoop();
+        console.log("Reset Scheme Worked!")
         boi.io._closed = false;
         boi.io.protocol._closed = false; //hack
         reset_busy = false;
         boi.ready = true;
+        boi.state.emit("connect");
     } catch (e) {
         console.error(e);
     }
@@ -535,18 +536,7 @@ function later(fn, ensure, closed) {
         var captured_res = () => {
             try {
                 if (boi.io.isClosed()) {
-                    if (ensure) {
-                        later(fn, true, true).then((r) => {
-                            return res(r);
-                        }).catch((e) => {
-                            return rej(e);
-                        });
-                        reset(new Error("Closed!"));
-                    }
-                    else {
-                        reset(new Error("Closed!"));
-                        return rej("Internal Error")
-                    }
+                    throw new Error("BOI is closed")
                 }
                 else {
                     var result = fn();
@@ -554,8 +544,18 @@ function later(fn, ensure, closed) {
                 }
             }
             catch (e) {
-                reset(e);
-                return rej("Internal Error")
+                if (ensure) {
+                    later(fn, true, true).then((r) => {
+                        return res(r);
+                    }).catch((e) => {
+                        return rej(e);
+                    });
+                    reset(e);
+                }
+                else {
+                    reset(e);
+                    return rej(e)
+                }
             }
         }
         if (boi.io && !closed) {
@@ -633,7 +633,6 @@ async function join(servers = boi.defaultServers, opts = {
         }
     }
 
-
     boi.nc = boi.io;
     _parse_states(boi.io);
     boi.state.on(["connect", "reconnect"], () => {
@@ -642,9 +641,9 @@ async function join(servers = boi.defaultServers, opts = {
     boi.state.on(["disconnect", "error"], () => {
         boi.ready = false;
     })
-    enableMessaging();
-    boi.state.emit("connect");
     join_busy = false;
+    boi.state.emit("connect");
+    enableMessaging();
     return boi;
 }
 

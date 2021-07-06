@@ -517,8 +517,7 @@ export class cs_comp_route_mgr extends comp_base {
             this.router.addRoute(i, noop);
             console.log("Router Reg", i)
         }
-
-        co_loop((t) => {
+        this.co_loop((t) => {
             if (changed("route", this.data.route)) {
                 this.applyRoute();
             }

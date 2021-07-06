@@ -47,15 +47,13 @@ export function vaultEnsureTokamak(redirect, cb) {
 
 
 export function vaultTokamakFingerPrint() {
-    if (!window.tokamak || navigator.userAgent.indexOf("tokamak") == -1) {
+    if (!window.tokamak || !window.tokamak.getEnv || navigator.userAgent.indexOf("tokamak") == -1) {
         return {
             tokamak: false
         }
     }
     else {
-        return {
-            tokamak: true
-        }
+        return window.tokamak.getEnv();
     }
 }
 

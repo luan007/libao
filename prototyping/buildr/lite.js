@@ -1,10 +1,15 @@
 import * as gui from "dat.gui";
+import { configFromHash } from "../../core";
 
 export var defaultDatGUI;
 
 export function prep() {
     if (!defaultDatGUI) {
         defaultDatGUI = new gui.GUI()
+
+        if(configFromHash()["production"] && !configFromHash["datgui"]) {
+            defaultDatGUI.hide();
+        }
     }
 }
 
