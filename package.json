@@ -20,6 +20,10 @@
     "vue": "./node_modules/vue/dist/vue.js",
     "vue3": "./node_modules/vue3/dist/vue.esm-browser.js"
   },
+  "browserslist": [
+    "iOS >= 10"
+  ],
+  "source": true,
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^3.2.0",
     "core-js": "^3.8.1",
@@ -37,6 +41,7 @@
     "postprocessing": "^6.21.2",
     "qps": "^1.1.1",
     "qrcode": "^1.4.4",
+    "qs": "^6.10.1",
     "resolve-relative-url": "^1.0.0",
     "routes": "^2.1.0",
     "socket.io-client": "^2.3.1",

@@ -1,6 +1,7 @@
 import { connect, NatsError, headers, RequestOptions, StringCodec, NatsConnection, SubscriptionOptions, PublishOptions, Msg } from "nats.ws/lib/src/mod.js"
 import { EventEmitter2 } from "eventemitter2";
 import { nanoid } from "nanoid";
+import { cfg } from "../cfg";
 
 var env = {
     Scope: "raw",
@@ -342,6 +343,20 @@ class scope {
 
 var base = new scope({});
 
+var svc = ["ws://localhost:1884", "ws://emerge.systems:1884"];
+if (cfg("nats") == 'local') {
+    svc = ['ws://localhost:1884'];
+}
+else if(cfg("nats") == 'cloud') {
+    svc = ['ws://emerge.systems:1884'];
+}
+else if(cfg("nats") == 'hybrid') {
+    svc = ["ws://localhost:1884", "ws://emerge.systems:1884"];
+}
+else if(Array.isArray(cfg("nats"))) {
+    svc = cfg("nats");
+}
+
 export var boi = {
     env: env,
     state: new EventEmitter2({
@@ -361,7 +376,7 @@ export var boi = {
     local: ["ws://localhost:1884"],
     remote: ["ws://emerge.systems:1884"],
 
-    defaultServers: ["ws://localhost:1884", "ws://emerge.systems:1884"],
+    defaultServers: svc,
     codec: StringCodec(),
 
     cbBinary,

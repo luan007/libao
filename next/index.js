@@ -5,3 +5,4 @@ export * from "./cs/cs.js";
 export * from "./cs/cs-comps";
 export * from "./cs/cs-util.js";
 export * from "./vault/vault"
+export * from "./cfg"

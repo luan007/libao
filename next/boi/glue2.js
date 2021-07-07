@@ -18,7 +18,7 @@ var glue_log = function () { }
 
 export var glue2ManagedAddrs = glue_managed;
 
-function glue2ListenOnAddr(addr) {
+function glue2ListenOnAddr(addr, no_respond) {
 
     if (registered_as_catch_all) return;
 
@@ -73,33 +73,35 @@ function glue2ListenOnAddr(addr) {
         }
     });
 
-    boi.sub("glue.ask." + _Scope + "." + addr, (err, msg) => {
-        if (err || !msg.body || !msg.body.addr) return;
-        if (!glue_managed.addrs[msg.body.addr]) {
-            glue2Ref(msg.body.addr, msg.body.value, msg.body.version)
-        }
-        if (glue_managed.addrs[msg.body.addr]) {
-            if (
-                glue_managed.addrs[msg.body.addr].type == 'value' &&
-                msg.body.version < glue_managed.addrs[msg.body.addr].version) {
-                glue2Sync(
-                    glue_managed.addrs[msg.body.addr].addr,
-                    glue_managed.addrs[msg.body.addr].value,
-                    glue_managed.addrs[msg.body.addr].version
-                )
+    if (no_respond) {
+        boi.sub("glue.ask." + _Scope + "." + addr, (err, msg) => {
+            if (err || !msg.body || !msg.body.addr) return;
+            if (!glue_managed.addrs[msg.body.addr]) {
+                glue2Ref(msg.body.addr, msg.body.value, msg.body.version)
             }
-            else if (
-                glue_managed.addrs[msg.body.addr].type == 'remote_value' &&
-                msg.body.version < glue_managed.addrs[msg.body.addr].version) {
-                glue2Sync(
-                    glue_managed.addrs[msg.body.addr].addr,
-                    glue_managed.addrs[msg.body.addr].cmd_value,
-                    glue_managed.addrs[msg.body.addr].version,
-                    'remote'
-                )
+            if (glue_managed.addrs[msg.body.addr]) {
+                if (
+                    glue_managed.addrs[msg.body.addr].type == 'value' &&
+                    msg.body.version < glue_managed.addrs[msg.body.addr].version) {
+                    glue2Sync(
+                        glue_managed.addrs[msg.body.addr].addr,
+                        glue_managed.addrs[msg.body.addr].value,
+                        glue_managed.addrs[msg.body.addr].version
+                    )
+                }
+                else if (
+                    glue_managed.addrs[msg.body.addr].type == 'remote_value' &&
+                    msg.body.version < glue_managed.addrs[msg.body.addr].version) {
+                    glue2Sync(
+                        glue_managed.addrs[msg.body.addr].addr,
+                        glue_managed.addrs[msg.body.addr].cmd_value,
+                        glue_managed.addrs[msg.body.addr].version,
+                        'remote'
+                    )
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 export function glue2CatchAllTraffic() {
@@ -295,7 +297,7 @@ export function glue2RORef(addr, value = null, version = 0) {
         ...glue_managed.addrs,
         ...temp
     }
-    glue2ListenOnAddr(addr);
+    glue2ListenOnAddr(addr, true);
     glue2AskForUpdate(addr, 0);
     return shell;
 }
