@@ -58,11 +58,14 @@ export function domMakeShowBox({
     d.appendChild(tiny);
 
     d.classList.add("dev")
-    d.style.transform = "translate(-50%, -50%)";
-    d.style.transformOrigin = "50% 50%";
+    // d.style.transform = "translate(-50%, -50%)";
+    // d.style.transformOrigin = "50% 50%";
     d.style.position = "absolute";
-    d.style.top = "50%";
-    d.style.left = "50%";
+    d.style.top = "0";
+    d.style.left = "0";
+    d.style.right = "0";
+    d.style.bottom = "0";
+    d.style.margin = "auto";
     d.style.opacity = 0;
     child.style.position = `absolute`;
     child.style.transformOrigin = `0 0`;
