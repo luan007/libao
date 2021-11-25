@@ -343,15 +343,15 @@ class scope {
 
 var base = new scope({});
 
-var svc = ["ws://localhost:1884", "ws://emerge.systems:1884"];
+var svc = ["ws://localhost:1884", "ws://pub.cn.emerge.ltd:1884"];
 if (cfg("nats") == 'local') {
     svc = ['ws://localhost:1884'];
 }
 else if(cfg("nats") == 'cloud') {
-    svc = ['ws://emerge.systems:1884'];
+    svc = ['ws://pub.cn.emerge.ltd:1884'];
 }
 else if(cfg("nats") == 'hybrid') {
-    svc = ["ws://localhost:1884", "ws://emerge.systems:1884"];
+    svc = ["ws://localhost:1884", "ws://pub.cn.emerge.ltd:1884"];
 }
 else if(Array.isArray(cfg("nats"))) {
     svc = cfg("nats");
@@ -374,7 +374,7 @@ export var boi = {
     join: join,
 
     local: ["ws://localhost:1884"],
-    remote: ["ws://emerge.systems:1884"],
+    remote: ["ws://pub.cn.emerge.ltd:1884"],
 
     defaultServers: svc,
     codec: StringCodec(),
