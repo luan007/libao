@@ -46,7 +46,7 @@
     "routes": "^2.1.0",
     "socket.io-client": "^2.3.1",
     "stats.js": "^0.17.0",
-    "three": "^0.126.0",
+    "three": "^0.137.0",
     "vue": "^2.6.12",
     "vue3": "npm:vue@^3.0.0"
   },
