@@ -41,7 +41,7 @@
     "postprocessing": "^6.21.2",
     "qps": "^1.1.1",
     "qrcode": "^1.4.4",
-    "qs": "^6.10.1",
+    "qs": "^6.10.3",
     "resolve-relative-url": "^1.0.0",
     "routes": "^2.1.0",
     "socket.io-client": "^2.3.1",
